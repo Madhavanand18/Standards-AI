@@ -7,6 +7,7 @@ const API_BASE = 'http://localhost:8000/api/v1';
 
 export default function App() {
   const [query, setQuery] = useState('');
+  const [limit, setLimit] = useState(10);
   const [searchedQuery, setSearchedQuery] = useState('');
   const [results, setResults] = useState([]);
   const [totalMatches, setTotalMatches] = useState(0);
@@ -28,7 +29,7 @@ export default function App() {
       });
   }, []);
 
-  const handleSearch = async (searchQuery) => {
+  const handleSearch = async (searchQuery, customLimit) => {
     const q = (searchQuery || query).trim();
     if (!q) return;
 
@@ -36,13 +37,15 @@ export default function App() {
     setError(null);
     setSearchedQuery(q);
 
+    const activeLimit = customLimit || limit;
+
     try {
       const res = await fetch(`${API_BASE}/search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: q, limit: 10 }),
+        body: JSON.stringify({ query: q, limit: activeLimit }),
       });
 
       if (!res.ok) {
@@ -74,6 +77,8 @@ export default function App() {
         setQuery={setQuery}
         onSearch={handleSearch}
         loading={loading}
+        limit={limit}
+        setLimit={setLimit}
       />
 
       {error && (
@@ -96,7 +101,7 @@ export default function App() {
               Found {results.length} Potentially Applicable Standard{results.length > 1 ? 's' : ''}
             </h2>
             <span className="anti-hallucination-badge">
-              ✓ Grounded in Verified BIS Scope
+              ✓ Based on Verified BIS Scope
             </span>
           </div>
 

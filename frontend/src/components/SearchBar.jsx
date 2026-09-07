@@ -10,7 +10,7 @@ const QUICK_QUERIES = [
   "Design concrete mix proportioning guidelines"
 ];
 
-export default function SearchBar({ query, setQuery, onSearch, loading }) {
+export default function SearchBar({ query, setQuery, onSearch, loading, limit, setLimit }) {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -37,7 +37,33 @@ export default function SearchBar({ query, setQuery, onSearch, loading }) {
           disabled={loading}
         />
         <div className="search-actions">
-          <span className="char-count">{query.length} characters</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <span className="char-count">{query.length} characters</span>
+            {setLimit && (
+              <label style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span>Limit:</span>
+                <select
+                  value={limit || 10}
+                  onChange={(e) => setLimit(Number(e.target.value))}
+                  disabled={loading}
+                  style={{
+                    background: '#0f172a',
+                    color: '#e2e8f0',
+                    border: '1px solid #334155',
+                    borderRadius: '4px',
+                    padding: '0.2rem 0.4rem',
+                    fontSize: '0.8rem',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value={5}>Top 5</option>
+                  <option value={10}>Top 10</option>
+                  <option value={15}>Top 15</option>
+                </select>
+              </label>
+            )}
+          </div>
           <button
             id="search-btn"
             className="search-btn"

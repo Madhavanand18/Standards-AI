@@ -1,9 +1,15 @@
 from pydantic import BaseModel, Field
 from typing import Any
+from app.core.config import settings
 
 class SearchRequest(BaseModel):
     query: str = Field(..., min_length=2, description="Technical specification or product description for procurement")
-    limit: int = Field(default=10, ge=1, le=50, description="Maximum number of standards to return")
+    limit: int = Field(
+        default=settings.DEFAULT_SEARCH_LIMIT,
+        ge=1,
+        le=settings.MAX_SEARCH_LIMIT,
+        description="Maximum number of standards to return"
+    )
 
 class StandardResult(BaseModel):
     db_id: int | None = None

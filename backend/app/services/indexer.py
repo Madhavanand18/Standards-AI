@@ -49,8 +49,8 @@ def index_standards(
     svc = embedding_svc or get_embedding_service()
     store = vector_store or get_vector_store()
 
-    # Ensure collection exists with correct dimension
-    store.ensure_collection(dimension=svc.dimension)
+    # Ensure fresh collection exists with correct dimension
+    store.recreate_collection(dimension=svc.dimension)
 
     # Build semantic texts
     texts = [build_semantic_text(s) for s in standards]

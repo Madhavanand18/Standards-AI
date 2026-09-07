@@ -3,17 +3,26 @@
 ## Current Status
 - **Run 0 (Project Foundation and Environment):** COMPLETED
 - **Run 1 (Core Semantic Standards Search MVP):** COMPLETED
+- **Pre-Run-2 Data Quality & Evidence Cleanup:** COMPLETED
 - **Run 2 (Improved Ranking, Metadata Filtering, Confidence and Explanations):** NOT STARTED
 - **Run 3 to Run 8:** NOT STARTED
 
 ---
 
-## Functional Status (Run 1 Completed)
+## Functional Status (Run 1 + Pre-Run-2 Cleanup Completed)
 - A working, fully verified vertical slice from authentic BIS seed metadata to browser-based interactive semantic retrieval is operational.
 - Users can enter procurement specifications or tender clauses in the React UI and receive real, verified Indian Standards ranked by dense cosine similarity.
 - 100% local operation: zero paid API dependencies, zero external cloud requirements.
-- 9/9 automated backend tests passing (`pytest backend/tests/ -v`).
+- 9/9 automated backend tests passing (`pytest backend/tests/ -v`, 2.41s).
 - Live end-to-end browser testing verified via automated browser subagent.
+
+### Pre-Run-2 Cleanup Summary
+- All unsupported regulatory/QCO/procurement claims removed from `source_evidence_note` fields in the seed dataset.
+- Regulatory/QCO determination explicitly deferred to Run 5; no enforcement status is stored or displayed.
+- Source URLs retained as BIS portal search references; none were fabricated.
+- UI wording updated: "Semantic Match" → "Semantic Relevance", "Grounded in Verified BIS Scope" → "Based on Verified BIS Scope", "BIS Source Portal" → "BIS Reference Link".
+- Configurable `limit` parameter added to the search API and exposed as a dropdown in the frontend (Top 5 / 10 / 15).
+- `RUN_1_REPORT.md` updated with Section 8: Data Quality Notes documenting all changes.
 
 ---
 
@@ -45,7 +54,7 @@
 
 ### 5. Automated Tests & Quality Assurance
 - Test Suite: [`backend/tests/`](file:///c:/Standards-AI/backend/tests/) (`test_db.py`, `test_embedding_qdrant.py`, `test_api.py`).
-- 9 passed in 2.55s.
+- 9 passed in 2.41s (re-verified post Pre-Run-2 cleanup).
 
 ---
 

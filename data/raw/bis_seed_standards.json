@@ -21,7 +21,7 @@
       "tensile strength"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1786",
-    "source_evidence_note": "Official BIS standard specification for concrete reinforcement bars widely mandated in CPWD, NHAI, Indian Railways, and state PWD procurement schedules."
+    "source_evidence_note": "Official BIS standard specification covering high strength deformed steel bars and wires for concrete reinforcement."
   },
   {
     "standard_number": "IS 2062:2011",
@@ -45,7 +45,7 @@
       "bridge fabrication"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+2062",
-    "source_evidence_note": "Mandatory standard for primary structural steel sections and plates used in government and infrastructure projects, covered under Steel and Steel Products QCO."
+    "source_evidence_note": "Relevant BIS standard covering hot-rolled medium and high tensile structural steel plates, sections, flats, and bars."
   },
   {
     "standard_number": "IS 456:2000",
@@ -67,7 +67,7 @@
       "compressive strength"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+456",
-    "source_evidence_note": "The national benchmark standard for design and construction of plain and reinforced concrete building and civil infrastructure works."
+    "source_evidence_note": "BIS code of practice for the general structural use and design considerations of plain and reinforced concrete."
   },
   {
     "standard_number": "IS 269:2015",
@@ -90,7 +90,7 @@
       "concrete"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+269",
-    "source_evidence_note": "Harmonized single standard governing all grades of Ordinary Portland Cement (OPC 33, 43, 53) under mandatory BIS certification."
+    "source_evidence_note": "BIS standard specifying chemical and physical requirements for 33, 43, and 53 grades of ordinary Portland cement."
   },
   {
     "standard_number": "IS 694:2010",
@@ -112,7 +112,7 @@
       "electrical conductor"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+694",
-    "source_evidence_note": "Standard referenced across government building specifications and CPWD electrical schedules for low-voltage internal wiring."
+    "source_evidence_note": "BIS standard specifying requirements and tests for PVC insulated electric cables and flexible cords for voltages up to 450/750 V."
   },
   {
     "standard_number": "IS 7098 (Part 1):1988",
@@ -134,7 +134,7 @@
       "distribution cables"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+7098",
-    "source_evidence_note": "Core standard for underground distribution and industrial LT power cables in DISCOM and municipal tenders."
+    "source_evidence_note": "BIS standard covering requirements and tests for crosslinked polyethylene (XLPE) insulated cables for working voltages up to 1100 V."
   },
   {
     "standard_number": "IS 1554 (Part 1):1988",
@@ -155,7 +155,7 @@
       "copper conductor"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1554",
-    "source_evidence_note": "Heavy-duty power and control cable standard extensively used for industrial plants and substation wiring."
+    "source_evidence_note": "BIS standard covering requirements of PVC insulated heavy duty electric cables for voltages up to 1100 V."
   },
   {
     "standard_number": "IS 1239 (Part 1):2004",
@@ -177,7 +177,7 @@
       "screwed and socketed"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1239",
-    "source_evidence_note": "Standard specification for MS and GI pipes used in plumbing, water distribution, and HVAC services."
+    "source_evidence_note": "BIS standard specifying requirements for welded and seamless steel tubes and pipes for water, non-hazardous gas, air, and steam."
   },
   {
     "standard_number": "IS 4984:2016",
@@ -200,7 +200,7 @@
       "Jal Jeevan Mission"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+4984",
-    "source_evidence_note": "Prime standard for drinking water supply distribution networks, extensively referenced under Jal Jeevan Mission and urban water supply tenders."
+    "source_evidence_note": "BIS standard specifying requirements for high density polyethylene (HDPE) pipes for conveyance of water for human consumption."
   },
   {
     "standard_number": "IS 3589:2001",
@@ -221,7 +221,7 @@
       "external coating"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+3589",
-    "source_evidence_note": "Standard for large diameter feeder water mains and transmission pipelines in municipal and regional water supply projects."
+    "source_evidence_note": "BIS standard covering requirements for seamless or electrically welded steel pipes (168.3 mm to 2540 mm OD) for water, gas, and sewage."
   },
   {
     "standard_number": "IS 2925:1984",
@@ -243,7 +243,7 @@
       "worker safety"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+2925",
-    "source_evidence_note": "Mandatory safety helmet standard under BIS certification for construction, mining, and industrial factory procurement."
+    "source_evidence_note": "BIS standard covering physical, constructional, and performance requirements for industrial safety helmets."
   },
   {
     "standard_number": "IS 15298 (Part 2):2016",
@@ -265,7 +265,7 @@
       "occupational footwear"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+15298",
-    "source_evidence_note": "Enforced under Footwear Quality Control Orders (QCOs) for workplace, defense, and industrial workforce procurement."
+    "source_evidence_note": "BIS standard specifying basic and additional requirements for safety footwear and protective toecaps."
   },
   {
     "standard_number": "IS 800:2007",
@@ -288,7 +288,7 @@
       "portal frames"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+800",
-    "source_evidence_note": "The national design code for structural steelwork in commercial, industrial, and infrastructure construction in India."
+    "source_evidence_note": "BIS code of practice for general construction and limit state design in structural steel."
   },
   {
     "standard_number": "IS 10262:2019",
@@ -309,7 +309,7 @@
       "slump"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+10262",
-    "source_evidence_note": "Authoritative guidelines for preparing design mix concrete submitted in contractor quality assurance plans."
+    "source_evidence_note": "BIS guidelines for proportioning concrete mixes for ordinary, standard, and high strength concrete."
   },
   {
     "standard_number": "IS 1077:2020",
@@ -331,6 +331,6 @@
       "wall construction"
     ],
     "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1077",
-    "source_evidence_note": "Standard specification for burnt clay bricks required in CPWD and state government masonry tender schedules."
+    "source_evidence_note": "BIS standard specifying dimensions, quality, and compressive strength requirements for common burnt clay building bricks."
   }
 ]

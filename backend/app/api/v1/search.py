@@ -2,7 +2,7 @@ import logging
 from fastapi import APIRouter, HTTPException, Query, Depends
 
 from app.core.config import settings
-from app.db.database import get_db_cursor
+from app.db.database import get_db_cursor, get_standard_by_number
 from app.schemas.search import SearchRequest, SearchResponse, StandardResult, HealthResponse
 from app.services.embedding import get_embedding_service, BaseEmbeddingService
 from app.services.vector_store import get_vector_store, QdrantVectorStore
@@ -67,7 +67,7 @@ def search_standards(
             limit=request.limit
         )
 
-        # 3. Format results with official BIS metadata
+        # 3. Format results with canonical SQLite BIS metadata
         results: list[StandardResult] = []
         for m in matches:
             payload = m.get("payload", {})
@@ -76,21 +76,25 @@ def search_standards(
             # Ensure confidence is clamped between 0 and 1
             clamped_score = max(0.0, min(1.0, score))
 
+            std_number = payload.get("standard_number", "UNKNOWN")
+            db_record = get_standard_by_number(std_number) or {}
+            full_scope = db_record.get("scope") or payload.get("scope", "")
+
             results.append(
                 StandardResult(
-                    db_id=payload.get("db_id"),
-                    standard_number=payload.get("standard_number", "UNKNOWN"),
-                    title=payload.get("title", ""),
+                    db_id=db_record.get("id") or payload.get("db_id"),
+                    standard_number=std_number,
+                    title=db_record.get("title") or payload.get("title", ""),
                     similarity_score=clamped_score,
-                    category=payload.get("category"),
-                    department=payload.get("department"),
-                    scope=payload.get("scope", ""),
-                    scope_snippet=payload.get("scope_snippet"),
-                    status=payload.get("status", "ACTIVE"),
-                    year_of_publication=payload.get("year_of_publication"),
-                    edition=payload.get("edition"),
-                    source_url=payload.get("source_url"),
-                    source_evidence_note=payload.get("source_evidence_note")
+                    category=db_record.get("category") or payload.get("category"),
+                    department=db_record.get("department") or payload.get("department"),
+                    scope=full_scope,
+                    scope_snippet=payload.get("scope_snippet") or (full_scope[:280] + "..." if len(full_scope) > 280 else full_scope),
+                    status=db_record.get("status") or payload.get("status", "ACTIVE"),
+                    year_of_publication=db_record.get("year_of_publication") or payload.get("year_of_publication"),
+                    edition=db_record.get("edition") or payload.get("edition"),
+                    source_url=db_record.get("source_url") or payload.get("source_url"),
+                    source_evidence_note=db_record.get("source_evidence_note") or payload.get("source_evidence_note")
                 )
             )
 

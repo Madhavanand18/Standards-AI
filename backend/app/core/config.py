@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     SQLITE_DB_PATH: Path = WORKSPACE_DIR / "data" / "db" / "standards.db"
     SEED_DATA_PATH: Path = WORKSPACE_DIR / "data" / "raw" / "bis_seed_standards.json"
 
+    # Search Settings
+    DEFAULT_SEARCH_LIMIT: int = 10
+    MAX_SEARCH_LIMIT: int = 50
+
     # Qdrant Vector DB Settings
     # If QDRANT_URL is not set, QdrantClient uses local embedded disk storage
     QDRANT_URL: str | None = None

@@ -120,3 +120,53 @@ Ran `pytest backend/tests/ -v` (9 passed in 2.55s):
 2. **No Field Filtering:** Searching cannot yet be filtered by Department or Category (scheduled for Run 2).
 3. **Discrete Confidence Calibration:** Scores are raw cosine similarities rather than calibrated High/Medium/Low confidence bands (scheduled for Run 2).
 4. **Scope Excerpt Highlighting:** The UI currently displays the scope snippet rather than highlighting the specific matched sentence (scheduled for Run 2).
+
+---
+
+## 8. Data Quality Notes (Pre-Run-2 Cleanup)
+
+> Applied after Run 1 completion, before Run 2. No new standards, architecture changes, or Run 2 logic were introduced.
+
+### 8.1 Seed Dataset Scope
+Run 1 uses a limited **15-standard seed dataset** covering high-priority public procurement categories. This dataset is intentionally small and curated for demonstration purposes.
+
+Semantic search results indicate **potential relevance** based on cosine similarity against officially stored BIS standard scope text. They do **not** indicate legal applicability, mandatory compliance, or formal procurement authority approval.
+
+### 8.2 Evidence Notes — Claims Removed or Neutralised
+The following unsupported regulatory/procurement claims were present in the original `source_evidence_note` fields and have been replaced with neutral, scope-derived descriptions:
+
+| Standard | Original Claim (Removed) | Replacement (Neutral) |
+| :--- | :--- | :--- |
+| IS 1786:2008 | "widely mandated in CPWD, NHAI, Indian Railways, and state PWD procurement schedules" | "Official BIS standard specification covering high strength deformed steel bars and wires for concrete reinforcement." |
+| IS 2062:2011 | "Mandatory standard… covered under Steel and Steel Products QCO" | "Relevant BIS standard covering hot-rolled medium and high tensile structural steel plates, sections, flats, and bars." |
+| IS 269:2015 | "under mandatory BIS certification" | "BIS standard specifying chemical and physical requirements for 33, 43, and 53 grades of ordinary Portland cement." |
+| IS 694:2010 | "referenced across government building specifications and CPWD electrical schedules" | "BIS standard specifying requirements and tests for PVC insulated electric cables for voltages up to 450/750 V." |
+| IS 7098 (Part 1):1988 | "Core standard for… DISCOM and municipal tenders" | "BIS standard covering requirements and tests for XLPE insulated cables for working voltages up to 1100 V." |
+| IS 1554 (Part 1):1988 | "extensively used for industrial plants and substation wiring" | "BIS standard covering requirements of PVC insulated heavy duty electric cables for voltages up to 1100 V." |
+| IS 4984:2016 | "extensively referenced under Jal Jeevan Mission and urban water supply tenders" | "BIS standard specifying requirements for high density polyethylene (HDPE) pipes for conveyance of water for human consumption." |
+| IS 3589:2001 | "Standard for large diameter feeder water mains and transmission pipelines in municipal and regional water supply projects" | "BIS standard covering requirements for seamless or electrically welded steel pipes (168.3 mm to 2540 mm OD) for water, gas, and sewage." |
+| IS 2925:1984 | "Mandatory safety helmet standard under BIS certification for construction, mining, and industrial factory procurement" | "BIS standard covering physical, constructional, and performance requirements for industrial safety helmets." |
+| IS 15298 (Part 2):2016 | "Enforced under Footwear Quality Control Orders (QCOs)" | "BIS standard specifying basic and additional requirements for safety footwear and protective toecaps." |
+| IS 800:2007 | "The national design code for structural steelwork" | "BIS code of practice for general construction and limit state design in structural steel." |
+| IS 10262:2019 | "Authoritative guidelines for preparing design mix concrete submitted in contractor quality assurance plans" | "BIS guidelines for proportioning concrete mixes for ordinary, standard, and high strength concrete." |
+| IS 1239 (Part 1):2004 | "Standard specification for MS and GI pipes used in plumbing, water distribution, and HVAC services" | "BIS standard specifying requirements for welded and seamless steel tubes and pipes for water, non-hazardous gas, air, and steam." |
+| IS 456:2000 | "The national benchmark standard for design and construction of plain and reinforced concrete" | "BIS code of practice for the general structural use and design considerations of plain and reinforced concrete." |
+| IS 1077:2020 | "required in CPWD and state government masonry tender schedules" | "BIS standard specifying dimensions, quality, and compressive strength requirements for common burnt clay building bricks." |
+
+### 8.3 Regulatory/QCO Applicability — Intentionally Deferred
+Determination of which standards are subject to a Quality Control Order (QCO) or are otherwise legally mandatory is **intentionally deferred to Run 5**. The current system does not store, compute, or display QCO enforcement status. Procurement officers must independently verify regulatory applicability through the official BIS and relevant Ministry notifications.
+
+### 8.4 Source URLs
+Source URLs in the seed dataset point to the BIS standards search portal (`standardsbis.bsbedge.com`) using the standard number as a query parameter. These are reference links to the BIS portal search interface and should be treated as starting points for manual verification against the current BIS catalogue, not as guaranteed direct links to the exact standard document page. No URLs were fabricated or altered beyond what was present in the original Run 1 seed data.
+
+### 8.5 UI Wording Changes Applied
+- Score badge: `"Semantic Match"` → `"Semantic Relevance"` — to more accurately reflect that the score measures textual similarity against stored scope text, not confirmed applicability.
+- Results header badge: `"Grounded in Verified BIS Scope"` → `"Based on Verified BIS Scope"` — cleaner, less assertive phrasing appropriate for a procurement audience.
+- Source link label: `"BIS Source Portal"` → `"BIS Reference Link"` — clarifies the link is a search reference, not a direct download.
+
+### 8.6 Configurable Search Limit
+The hardcoded `limit: 10` in the search API has been made configurable:
+- `DEFAULT_SEARCH_LIMIT = 10` and `MAX_SEARCH_LIMIT = 50` are defined in `app/core/config.py` and overridable via environment variables.
+- The `SearchRequest` Pydantic schema reads these values from `settings` instead of hardcoding them.
+- The frontend exposes a **Limit** dropdown (Top 5 / Top 10 / Top 15) allowing users to control the number of results returned per query.
+- This is a configuration convenience only; no Run 2 ranking or reordering logic has been implemented.

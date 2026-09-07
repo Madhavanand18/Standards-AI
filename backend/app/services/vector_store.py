@@ -43,6 +43,14 @@ class QdrantVectorStore:
         else:
             logger.info(f"Collection '{self.collection_name}' already exists.")
 
+    def recreate_collection(self, dimension: int = 384) -> None:
+        """Deletes collection if exists and creates a clean new collection."""
+        existing_collections = [c.name for c in self.client.get_collections().collections]
+        if self.collection_name in existing_collections:
+            logger.info(f"Recreating Qdrant collection '{self.collection_name}'...")
+            self.client.delete_collection(self.collection_name)
+        self.ensure_collection(dimension=dimension)
+
     def get_collection_info(self) -> dict[str, Any]:
         """Returns metadata and count of vectors in the collection."""
         try:
