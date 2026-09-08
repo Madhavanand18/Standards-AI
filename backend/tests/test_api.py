@@ -263,3 +263,53 @@ def test_empty_query():
     assert response.status_code == 422 or response.status_code == 400
 
 
+def test_search_results_include_lifecycle_metadata():
+    """Verify that search results populate deterministic BIS lifecycle and amendment metadata."""
+    response = client.post(
+        "/api/v1/search",
+        json={"query": "High strength deformed steel bars for concrete reinforcement Fe 500", "limit": 5}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["results"]) > 0
+
+    # Locate IS 1786 in results
+    is_1786 = next((r for r in data["results"] if "IS 1786" in r["standard_number"]), None)
+    assert is_1786 is not None, "IS 1786 should be returned for TMT rebar query"
+    assert "lifecycle" in is_1786
+    lc = is_1786["lifecycle"]
+    assert lc is not None
+    assert lc["lifecycle_status"] == "ACTIVE"
+    assert lc["amendment_count"] == 2
+    assert len(lc["amendments"]) == 2
+    assert lc["amendments"][0]["amendment_number"] == 1
+    assert lc["amendments"][0]["year"] == 2012
+    assert lc["amendments"][1]["amendment_number"] == 2
+    assert lc["amendments"][1]["year"] == 2018
+    assert lc["supersedes"] == "IS 1786:1985"
+    assert lc["superseded_by"] is None
+    assert lc["edition"] == "Fourth Revision"
+    assert lc["source_url"] is not None
+    assert "standardsbis.bsbedge.com" in lc["source_url"]
+
+
+def test_search_lifecycle_reaffirmed_and_amendments():
+    """Verify reaffirmation years and amendment histories in search response for relevant standards."""
+    response = client.post(
+        "/api/v1/search",
+        json={"query": "Plain and reinforced concrete code of practice", "limit": 5}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["results"]) > 0
+
+    is_456 = next((r for r in data["results"] if "IS 456" in r["standard_number"]), None)
+    if is_456 and is_456["lifecycle"]:
+        lc = is_456["lifecycle"]
+        assert lc["lifecycle_status"] == "ACTIVE"
+        assert lc["reaffirmed_year"] == 2005
+        assert lc["supersedes"] == "IS 456:1978"
+        assert lc["amendment_count"] >= 1
+
+
+

@@ -98,7 +98,7 @@ export default function App() {
         <section className="results-section">
           <div className="results-header">
             <h2 className="results-count">
-              Found {results.length} Potentially Applicable Standard{results.length > 1 ? 's' : ''}
+              Found {totalMatches || results.length} Potentially Applicable Standard{(totalMatches || results.length) > 1 ? 's' : ''}
             </h2>
             <span className="anti-hallucination-badge">
               ✓ Based on Verified BIS Scope

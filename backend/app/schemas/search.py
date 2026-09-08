@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Any
 from app.core.config import settings
 from app.schemas.relationships import StandardRelationshipItem
+from app.schemas.lifecycle import StandardLifecycle
 
 class SearchRequest(BaseModel):
     query: str = Field(..., min_length=2, description="Technical specification or product description for procurement")
@@ -38,6 +39,7 @@ class StandardResult(BaseModel):
     source_evidence_note: str | None = None
     relationships: list[StandardRelationshipItem] = Field(default_factory=list)
     grouped_relationships: dict[str, list[StandardRelationshipItem]] = Field(default_factory=dict)
+    lifecycle: StandardLifecycle | None = None
 
 
 class SearchResponse(BaseModel):
