@@ -63,6 +63,25 @@ CREATE TABLE IF NOT EXISTS standard_amendments (
     UNIQUE(standard_id, amendment_number)
 );
 
+CREATE TABLE IF NOT EXISTS standard_compliance (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    standard_id INTEGER NOT NULL UNIQUE REFERENCES standards(id) ON DELETE CASCADE,
+    certification_status TEXT NOT NULL DEFAULT 'UNKNOWN',
+    certification_scheme TEXT,
+    qco_status TEXT NOT NULL DEFAULT 'UNKNOWN',
+    qco_reference TEXT,
+    qco_title TEXT,
+    issuing_authority TEXT,
+    enforcement_date TEXT,
+    evidence_source_title TEXT,
+    evidence_source_url TEXT,
+    evidence_source_type TEXT,
+    notes TEXT,
+    last_verified TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_standards_number ON standards(standard_number);
 CREATE INDEX IF NOT EXISTS idx_standards_category ON standards(category);
 CREATE INDEX IF NOT EXISTS idx_standards_status ON standards(status);
@@ -70,6 +89,9 @@ CREATE INDEX IF NOT EXISTS idx_rel_source ON standard_relationships(source_stand
 CREATE INDEX IF NOT EXISTS idx_rel_target ON standard_relationships(target_standard_id);
 CREATE INDEX IF NOT EXISTS idx_lifecycle_standard ON standard_lifecycle(standard_id);
 CREATE INDEX IF NOT EXISTS idx_amendments_standard ON standard_amendments(standard_id);
+CREATE INDEX IF NOT EXISTS idx_compliance_standard ON standard_compliance(standard_id);
+CREATE INDEX IF NOT EXISTS idx_compliance_cert_status ON standard_compliance(certification_status);
+CREATE INDEX IF NOT EXISTS idx_compliance_qco_status ON standard_compliance(qco_status);
 """
 
 def get_connection(db_path: Path | str | None = None) -> sqlite3.Connection:
@@ -293,4 +315,53 @@ def get_lifecycle_by_number(
         "verification_date": lc["verification_date"] if lc else None,
         "verification_note": lc["verification_note"] if lc else None,
         "amendments": amendments,
+    }
+
+
+def get_compliance_by_standard_id(
+    standard_id: int,
+    db_path: Path | str | None = None
+) -> dict[str, Any] | None:
+    """
+    Retrieves compliance and QCO metadata for a given standard id.
+    Returns None if no compliance record exists.
+    """
+    with get_db_cursor(db_path) as cursor:
+        cursor.execute(
+            "SELECT * FROM standard_compliance WHERE standard_id = ?",
+            (standard_id,)
+        )
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return dict(row)
+
+
+def get_compliance_by_number(
+    standard_number: str,
+    db_path: Path | str | None = None
+) -> dict[str, Any] | None:
+    """
+    Retrieves compliance metadata for a standard number.
+    Returns None if the standard does not exist.
+    """
+    std = get_standard_by_number(standard_number, db_path=db_path)
+    if not std:
+        return None
+    comp = get_compliance_by_standard_id(std["id"], db_path=db_path)
+    return {
+        "standard_id": std["id"],
+        "standard_number": std["standard_number"],
+        "certification_status": comp["certification_status"] if comp else "UNKNOWN",
+        "certification_scheme": comp["certification_scheme"] if comp else None,
+        "qco_status": comp["qco_status"] if comp else "UNKNOWN",
+        "qco_reference": comp["qco_reference"] if comp else None,
+        "qco_title": comp["qco_title"] if comp else None,
+        "issuing_authority": comp["issuing_authority"] if comp else None,
+        "enforcement_date": comp["enforcement_date"] if comp else None,
+        "evidence_source_title": comp["evidence_source_title"] if comp else None,
+        "evidence_source_url": comp["evidence_source_url"] if comp else None,
+        "evidence_source_type": comp["evidence_source_type"] if comp else None,
+        "notes": comp["notes"] if comp else None,
+        "last_verified": comp["last_verified"] if comp else None,
     }

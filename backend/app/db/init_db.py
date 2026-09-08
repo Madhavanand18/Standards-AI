@@ -13,6 +13,7 @@ def seed_database(
     seed_file_path: Path | str | None = None,
     seed_rel_path: Path | str | None = None,
     seed_lifecycle_path: Path | str | None = None,
+    seed_compliance_path: Path | str | None = None,
     db_path: Path | str | None = None,
     reset: bool = False
 ) -> int:
@@ -22,6 +23,7 @@ def seed_database(
 
     rel_path = Path(seed_rel_path or settings.SEED_RELATIONSHIPS_PATH)
     lc_path = Path(seed_lifecycle_path or settings.SEED_LIFECYCLE_PATH)
+    comp_path = Path(seed_compliance_path or settings.SEED_COMPLIANCE_PATH)
 
     init_db(db_path)
 
@@ -34,6 +36,7 @@ def seed_database(
     with get_db_cursor(db_path) as cursor:
         if reset:
             logger.warning("Reset flag is true. Clearing existing data...")
+            cursor.execute("DELETE FROM standard_compliance;")
             cursor.execute("DELETE FROM standard_amendments;")
             cursor.execute("DELETE FROM standard_lifecycle;")
             cursor.execute("DELETE FROM standard_relationships;")
@@ -163,6 +166,62 @@ def seed_database(
                     )
                     amd_count += 1
 
+        # Load and seed compliance metadata
+        comp_count = 0
+        if comp_path.exists():
+            with open(comp_path, "r", encoding="utf-8") as cf:
+                compliance_data: list[dict[str, Any]] = json.load(cf)
+
+            cursor.execute("DELETE FROM standard_compliance;")
+
+            for comp in compliance_data:
+                std_num = comp["standard_number"]
+                if std_num not in mapping:
+                    logger.warning(f"Compliance entry for unknown standard: {std_num} — skipped")
+                    continue
+
+                std_id = mapping[std_num]
+                cursor.execute(
+                    """
+                    INSERT INTO standard_compliance (
+                        standard_id, certification_status, certification_scheme, qco_status,
+                        qco_reference, qco_title, issuing_authority, enforcement_date,
+                        evidence_source_title, evidence_source_url, evidence_source_type,
+                        notes, last_verified
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(standard_id) DO UPDATE SET
+                        certification_status = excluded.certification_status,
+                        certification_scheme = excluded.certification_scheme,
+                        qco_status = excluded.qco_status,
+                        qco_reference = excluded.qco_reference,
+                        qco_title = excluded.qco_title,
+                        issuing_authority = excluded.issuing_authority,
+                        enforcement_date = excluded.enforcement_date,
+                        evidence_source_title = excluded.evidence_source_title,
+                        evidence_source_url = excluded.evidence_source_url,
+                        evidence_source_type = excluded.evidence_source_type,
+                        notes = excluded.notes,
+                        last_verified = excluded.last_verified,
+                        updated_at = CURRENT_TIMESTAMP;
+                    """,
+                    (
+                        std_id,
+                        comp.get("certification_status", "UNKNOWN"),
+                        comp.get("certification_scheme"),
+                        comp.get("qco_status", "UNKNOWN"),
+                        comp.get("qco_reference"),
+                        comp.get("qco_title"),
+                        comp.get("issuing_authority"),
+                        comp.get("enforcement_date"),
+                        comp.get("evidence_source_title"),
+                        comp.get("evidence_source_url"),
+                        comp.get("evidence_source_type"),
+                        comp.get("notes"),
+                        comp.get("last_verified"),
+                    )
+                )
+                comp_count += 1
+
         # Load relationships from curated JSON file if available
         relationships_to_seed = []
         if rel_path.exists():
@@ -206,7 +265,7 @@ def seed_database(
     logger.info(
         f"Database successfully populated with {count} standards, "
         f"{lc_count} lifecycle records, {amd_count} amendments, "
-        f"and {rel_count} relationships."
+        f"{comp_count} compliance records, and {rel_count} relationships."
     )
     return count
 

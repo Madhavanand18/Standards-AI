@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     SEED_DATA_PATH: Path = WORKSPACE_DIR / "data" / "raw" / "bis_seed_standards.json"
     SEED_RELATIONSHIPS_PATH: Path = WORKSPACE_DIR / "data" / "raw" / "bis_seed_relationships.json"
     SEED_LIFECYCLE_PATH: Path = WORKSPACE_DIR / "data" / "raw" / "bis_seed_lifecycle.json"
+    SEED_COMPLIANCE_PATH: Path = WORKSPACE_DIR / "data" / "raw" / "bis_seed_compliance.json"
 
     # Search Settings
     DEFAULT_SEARCH_LIMIT: int = 10

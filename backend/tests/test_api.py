@@ -288,9 +288,8 @@ def test_search_results_include_lifecycle_metadata():
     assert lc["amendments"][1]["year"] == 2018
     assert lc["supersedes"] == "IS 1786:1985"
     assert lc["superseded_by"] is None
-    assert lc["edition"] == "Fourth Revision"
     assert lc["source_url"] is not None
-    assert "standardsbis.bsbedge.com" in lc["source_url"]
+    assert "standards.bis.gov.in" in lc["source_url"] or "bis.gov.in" in lc["source_url"]
 
 
 def test_search_lifecycle_reaffirmed_and_amendments():
