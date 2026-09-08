@@ -231,10 +231,35 @@ def test_search_safety_helmets():
     standard_numbers = [r["standard_number"] for r in data["results"]]
     assert "IS 2925:1984" in standard_numbers
 
+def test_search_results_include_relationships():
+    """Verify that search results populate verified relationships and grouped_relationships."""
+    response = client.post(
+        "/api/v1/search",
+        json={"query": "Reinforced concrete design and construction practice", "limit": 5}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["results"]) > 0
+
+    # Locate IS 456 in results if present
+    is_456 = next((r for r in data["results"] if "IS 456" in r["standard_number"]), None)
+    if is_456:
+        assert len(is_456["relationships"]) >= 3
+        assert "normative_reference" in is_456["grouped_relationships"]
+        assert "design_code" in is_456["grouped_relationships"]
+        
+        # Verify evidence text and target structure
+        first_rel = is_456["relationships"][0]
+        assert first_rel["evidence_text"] is not None
+        assert "target_standard" in first_rel
+        assert "title" in first_rel["target_standard"]
+        assert "standard_number" in first_rel["target_standard"]
+
 def test_empty_query():
     response = client.post(
         "/api/v1/search",
         json={"query": "   ", "limit": 5}
     )
     assert response.status_code == 422 or response.status_code == 400
+
 

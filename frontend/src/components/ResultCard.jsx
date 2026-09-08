@@ -1,13 +1,33 @@
 import React, { useState } from 'react';
 
+const TYPE_LABELS = {
+  normative_reference: 'Normative Reference',
+  design_code: 'Design Code',
+  related_product: 'Related Product',
+  safety: 'Safety',
+  test_method: 'Test Method',
+  terminology: 'Terminology',
+};
+
 export default function ResultCard({ standard, rank }) {
   const [expanded, setExpanded] = useState(false);
 
   const scorePct = Math.round(standard.similarity_score * 100);
   const relevanceLabel = standard.relevance_label || (scorePct >= 60 ? 'High' : scorePct >= 40 ? 'Medium' : 'Low');
 
+  const relationships = standard.relationships || [];
+  const groupedRelationships = (standard.grouped_relationships && Object.keys(standard.grouped_relationships).length > 0)
+    ? standard.grouped_relationships
+    : relationships.reduce((acc, rel) => {
+        const typeKey = (rel.relationship_type || 'other').toLowerCase();
+        if (!acc[typeKey]) acc[typeKey] = [];
+        acc[typeKey].push(rel);
+        return acc;
+      }, {});
+
   return (
     <div className="result-card" id={`standard-${standard.standard_number.replace(/[^a-zA-Z0-9]/g, '-')}`}>
+
       <div className="result-card-top">
         <div className="standard-badge-group">
           <span className="standard-num-badge">{standard.standard_number}</span>
@@ -77,6 +97,54 @@ export default function ResultCard({ standard, rank }) {
           </button>
         )}
       </div>
+
+      {relationships.length > 0 && (
+        <div className="related-standards-section">
+          <div className="related-standards-header">
+            <div className="related-header-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+              <strong>Related BIS Standards ({relationships.length})</strong>
+            </div>
+            <span className="related-header-tag">Deterministic Normative Links</span>
+          </div>
+
+          <div className="related-groups-list">
+            {Object.entries(groupedRelationships).map(([typeKey, items]) => (
+              <div key={typeKey} className="related-type-group">
+                <div className="related-type-header">
+                  <span className={`rel-type-badge rel-type-${typeKey}`}>
+                    {TYPE_LABELS[typeKey] || typeKey.replace(/_/g, ' ')}
+                  </span>
+                  <span className="rel-count-badge">{items.length}</span>
+                </div>
+
+                <div className="related-items-container">
+                  {items.map((rel, idx) => {
+                    const target = rel.target_standard || {};
+                    return (
+                      <div key={rel.relationship_id || idx} className="related-item-card">
+                        <div className="related-item-top">
+                          <span className="related-std-num">{target.standard_number}</span>
+                          <span className="related-std-title">{target.title}</span>
+                        </div>
+                        {(rel.evidence_text || rel.description) && (
+                          <div className="related-evidence-text">
+                            <span className="evidence-label">Evidence / Citation:</span> {rel.evidence_text || rel.description}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
 
       <div className="result-footer">
         <div className="evidence-note">

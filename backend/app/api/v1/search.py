@@ -112,29 +112,40 @@ def search_standards(
             threshold=request.score_threshold
         )
 
-        # 5. Format results
-        results: list[StandardResult] = [
-            StandardResult(
-                db_id=c.get("db_id"),
-                standard_number=c["standard_number"],
-                title=c["title"],
-                similarity_score=c["similarity_score"],
-                relevance_label=c.get("relevance_label", "Medium"),
-                explanation=c.get("explanation"),
-                dense_score=c.get("dense_score"),
-                metadata_score=c.get("metadata_score"),
-                category=c.get("category"),
-                department=c.get("department"),
-                scope=c.get("scope", ""),
-                scope_snippet=c.get("scope_snippet"),
-                status=c.get("status", "ACTIVE"),
-                year_of_publication=c.get("year_of_publication"),
-                edition=c.get("edition"),
-                source_url=c.get("source_url"),
-                source_evidence_note=c.get("source_evidence_note")
+        # 5. Format results with attached verified standard relationships
+        from app.services.relationships import get_relationship_service
+        rel_service = get_relationship_service()
+
+        results: list[StandardResult] = []
+        for c in ranked_candidates:
+            rel_data = rel_service.get_related_standards(c["standard_number"]) or {}
+            rel_items = rel_data.get("relationships", [])
+            rel_grouped = rel_data.get("grouped_by_type", {})
+
+            results.append(
+                StandardResult(
+                    db_id=c.get("db_id"),
+                    standard_number=c["standard_number"],
+                    title=c["title"],
+                    similarity_score=c["similarity_score"],
+                    relevance_label=c.get("relevance_label", "Medium"),
+                    explanation=c.get("explanation"),
+                    dense_score=c.get("dense_score"),
+                    metadata_score=c.get("metadata_score"),
+                    category=c.get("category"),
+                    department=c.get("department"),
+                    scope=c.get("scope", ""),
+                    scope_snippet=c.get("scope_snippet"),
+                    status=c.get("status", "ACTIVE"),
+                    year_of_publication=c.get("year_of_publication"),
+                    edition=c.get("edition"),
+                    source_url=c.get("source_url"),
+                    source_evidence_note=c.get("source_evidence_note"),
+                    relationships=rel_items,
+                    grouped_relationships=rel_grouped
+                )
             )
-            for c in ranked_candidates
-        ]
+
 
         return SearchResponse(
             query=query_text,

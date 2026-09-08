@@ -7,19 +7,21 @@
 - **Run 2A (Dynamic Results & Metadata-Enhanced Ranking):** COMPLETED
 - **Run 2B (Explainability & Relevance Tiers):** COMPLETED
 - **Run 3A (Related Standards Foundation):** COMPLETED
-- **Run 3B to Run 8:** NOT STARTED
-
+- **Run 3B (Related Standards UI Integration):** COMPLETED
+- **Run 4 to Run 8:** NOT STARTED
 
 ---
 
-## Functional Status (Run 3A Completed)
-- Authoritative standard relationships stored in SQLite `standard_relationships` table with clause/standard scope evidence text.
-- 19 verified relationships across 6 relationship types (`normative_reference`, `design_code`, `related_product`, `safety`, `test_method`, `terminology`) covering the 15 BIS seed standards.
-- Deterministic relationship retrieval service (`RelationshipService`) with zero vector similarity inference and zero fabricated claims.
-- RESTful relationship endpoints exposed: `GET /api/v1/standards/{standard_number}/relationships` and `GET /api/v1/relationships?standard_number=...` with optional `relationship_type` filtering and type-based grouping.
-- Dynamic search results & hybrid ranking preserved from Run 2A/2B.
+## Functional Status (Run 3B Completed)
+- Related Standards UI integration completed: each search result card directly displays an interactive "Related BIS Standards" section when authoritative relationships exist.
+- Clean grouping by relationship type: Normative Reference, Design Code, Related Product, Safety, Test Method, Terminology with distinct visual type badges and count indicators.
+- Each related standard card displays the standard number, full title, relationship badge, and clause-level evidence citation.
+- Standards with zero relationships (e.g., standalone products) render cleanly without empty sections or visual clutter.
+- Search API (`POST /api/v1/search`) and standalone endpoints (`GET /api/v1/standards/{standard_number}/relationships`) cleanly deliver relationship payloads.
 - 100% local operation: zero paid API dependencies, zero external cloud requirements.
-- 27/27 automated backend tests passing (`pytest backend/tests/ -v`).
+- 28/28 automated backend tests passing (`pytest backend/tests/ -v`, 2.46s).
+- Frontend production bundle build verified (`npm run build`, 0 errors).
+
 
 
 ### Pre-Run-2 Cleanup Summary
