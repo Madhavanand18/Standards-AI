@@ -1,5 +1,5 @@
 from app.schemas.search import SearchRequest, SearchResponse, StandardResult, HealthResponse
-from app.schemas.compliance import StandardCompliance, CertificationStatus, QCOStatus
+from app.schemas.compliance import StandardCompliance, ComplianceEvent, CertificationStatus, QCOStatus
 
 __all__ = [
     "SearchRequest",
@@ -7,6 +7,7 @@ __all__ = [
     "StandardResult",
     "HealthResponse",
     "StandardCompliance",
+    "ComplianceEvent",
     "CertificationStatus",
     "QCOStatus",
 ]

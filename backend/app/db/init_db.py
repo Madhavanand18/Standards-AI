@@ -35,12 +35,15 @@ def seed_database(
     count = 0
     with get_db_cursor(db_path) as cursor:
         if reset:
-            logger.warning("Reset flag is true. Clearing existing data...")
-            cursor.execute("DELETE FROM standard_compliance;")
-            cursor.execute("DELETE FROM standard_amendments;")
-            cursor.execute("DELETE FROM standard_lifecycle;")
-            cursor.execute("DELETE FROM standard_relationships;")
-            cursor.execute("DELETE FROM standards;")
+            logger.warning("Reset flag is true. Dropping and recreating tables...")
+            cursor.execute("DROP TABLE IF EXISTS standard_compliance_events;")
+            cursor.execute("DROP TABLE IF EXISTS standard_compliance;")
+            cursor.execute("DROP TABLE IF EXISTS standard_amendments;")
+            cursor.execute("DROP TABLE IF EXISTS standard_lifecycle;")
+            cursor.execute("DROP TABLE IF EXISTS standard_relationships;")
+            cursor.execute("DROP TABLE IF EXISTS standards;")
+            from app.db.database import CREATE_TABLES_SQL
+            cursor.executescript(CREATE_TABLES_SQL)
 
         for std in standards_data:
             keywords_val = std.get("keywords")
@@ -168,10 +171,12 @@ def seed_database(
 
         # Load and seed compliance metadata
         comp_count = 0
+        event_count = 0
         if comp_path.exists():
             with open(comp_path, "r", encoding="utf-8") as cf:
                 compliance_data: list[dict[str, Any]] = json.load(cf)
 
+            cursor.execute("DELETE FROM standard_compliance_events;")
             cursor.execute("DELETE FROM standard_compliance;")
 
             for comp in compliance_data:
@@ -186,9 +191,10 @@ def seed_database(
                     INSERT INTO standard_compliance (
                         standard_id, certification_status, certification_scheme, qco_status,
                         qco_reference, qco_title, issuing_authority, enforcement_date,
-                        evidence_source_title, evidence_source_url, evidence_source_type,
-                        notes, last_verified
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        referenced_standard_edition, latest_standard_version,
+                        qco_clause_standard_applicability, evidence_source_title,
+                        evidence_source_url, evidence_source_type, notes, last_verified
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(standard_id) DO UPDATE SET
                         certification_status = excluded.certification_status,
                         certification_scheme = excluded.certification_scheme,
@@ -197,6 +203,9 @@ def seed_database(
                         qco_title = excluded.qco_title,
                         issuing_authority = excluded.issuing_authority,
                         enforcement_date = excluded.enforcement_date,
+                        referenced_standard_edition = excluded.referenced_standard_edition,
+                        latest_standard_version = excluded.latest_standard_version,
+                        qco_clause_standard_applicability = excluded.qco_clause_standard_applicability,
                         evidence_source_title = excluded.evidence_source_title,
                         evidence_source_url = excluded.evidence_source_url,
                         evidence_source_type = excluded.evidence_source_type,
@@ -213,6 +222,9 @@ def seed_database(
                         comp.get("qco_title"),
                         comp.get("issuing_authority"),
                         comp.get("enforcement_date"),
+                        comp.get("referenced_standard_edition"),
+                        comp.get("latest_standard_version"),
+                        comp.get("qco_clause_standard_applicability"),
                         comp.get("evidence_source_title"),
                         comp.get("evidence_source_url"),
                         comp.get("evidence_source_type"),
@@ -221,6 +233,27 @@ def seed_database(
                     )
                 )
                 comp_count += 1
+
+                # Seed compliance events / milestones
+                for ev in comp.get("events", []):
+                    cursor.execute(
+                        """
+                        INSERT INTO standard_compliance_events (
+                            standard_id, event_date, event_type, title, description,
+                            reference_doc, source_url
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            std_id,
+                            ev.get("event_date"),
+                            ev.get("event_type", "GENERAL"),
+                            ev.get("title", ""),
+                            ev.get("description"),
+                            ev.get("reference_doc"),
+                            ev.get("source_url"),
+                        )
+                    )
+                    event_count += 1
 
         # Load relationships from curated JSON file if available
         relationships_to_seed = []
@@ -265,7 +298,8 @@ def seed_database(
     logger.info(
         f"Database successfully populated with {count} standards, "
         f"{lc_count} lifecycle records, {amd_count} amendments, "
-        f"{comp_count} compliance records, and {rel_count} relationships."
+        f"{comp_count} compliance records, {event_count} compliance events, "
+        f"and {rel_count} relationships."
     )
     return count
 

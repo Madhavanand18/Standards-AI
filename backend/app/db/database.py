@@ -73,6 +73,9 @@ CREATE TABLE IF NOT EXISTS standard_compliance (
     qco_title TEXT,
     issuing_authority TEXT,
     enforcement_date TEXT,
+    referenced_standard_edition TEXT,
+    latest_standard_version TEXT,
+    qco_clause_standard_applicability TEXT,
     evidence_source_title TEXT,
     evidence_source_url TEXT,
     evidence_source_type TEXT,
@@ -80,6 +83,18 @@ CREATE TABLE IF NOT EXISTS standard_compliance (
     last_verified TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS standard_compliance_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    standard_id INTEGER NOT NULL REFERENCES standards(id) ON DELETE CASCADE,
+    event_date TEXT,
+    event_type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    reference_doc TEXT,
+    source_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_standards_number ON standards(standard_number);
@@ -92,6 +107,7 @@ CREATE INDEX IF NOT EXISTS idx_amendments_standard ON standard_amendments(standa
 CREATE INDEX IF NOT EXISTS idx_compliance_standard ON standard_compliance(standard_id);
 CREATE INDEX IF NOT EXISTS idx_compliance_cert_status ON standard_compliance(certification_status);
 CREATE INDEX IF NOT EXISTS idx_compliance_qco_status ON standard_compliance(qco_status);
+CREATE INDEX IF NOT EXISTS idx_compliance_events_standard ON standard_compliance_events(standard_id);
 """
 
 def get_connection(db_path: Path | str | None = None) -> sqlite3.Connection:
@@ -337,18 +353,35 @@ def get_compliance_by_standard_id(
         return dict(row)
 
 
+def get_compliance_events_by_standard_id(
+    standard_id: int,
+    db_path: Path | str | None = None
+) -> list[dict[str, Any]]:
+    """
+    Retrieves compliance events/milestones for a given standard_id, ordered chronologically.
+    """
+    with get_db_cursor(db_path) as cursor:
+        cursor.execute(
+            "SELECT * FROM standard_compliance_events WHERE standard_id = ? ORDER BY event_date ASC, id ASC",
+            (standard_id,)
+        )
+        rows = cursor.fetchall()
+        return [dict(r) for r in rows]
+
+
 def get_compliance_by_number(
     standard_number: str,
     db_path: Path | str | None = None
 ) -> dict[str, Any] | None:
     """
-    Retrieves compliance metadata for a standard number.
+    Retrieves full compliance and QCO metadata (including milestone events) for a standard number.
     Returns None if the standard does not exist.
     """
     std = get_standard_by_number(standard_number, db_path=db_path)
     if not std:
         return None
     comp = get_compliance_by_standard_id(std["id"], db_path=db_path)
+    events = get_compliance_events_by_standard_id(std["id"], db_path=db_path)
     return {
         "standard_id": std["id"],
         "standard_number": std["standard_number"],
@@ -359,9 +392,13 @@ def get_compliance_by_number(
         "qco_title": comp["qco_title"] if comp else None,
         "issuing_authority": comp["issuing_authority"] if comp else None,
         "enforcement_date": comp["enforcement_date"] if comp else None,
+        "referenced_standard_edition": comp["referenced_standard_edition"] if comp else None,
+        "latest_standard_version": comp["latest_standard_version"] if comp else None,
+        "qco_clause_standard_applicability": comp["qco_clause_standard_applicability"] if comp else None,
         "evidence_source_title": comp["evidence_source_title"] if comp else None,
         "evidence_source_url": comp["evidence_source_url"] if comp else None,
         "evidence_source_type": comp["evidence_source_type"] if comp else None,
         "notes": comp["notes"] if comp else None,
         "last_verified": comp["last_verified"] if comp else None,
+        "events": events,
     }

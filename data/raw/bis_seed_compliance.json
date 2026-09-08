@@ -8,11 +8,32 @@
     "qco_title": "Steel and Steel Products (Quality Control) Order, 2020",
     "issuing_authority": "Ministry of Steel, Government of India",
     "enforcement_date": "2020-05-27",
+    "referenced_standard_edition": "IS 1786:2008",
+    "latest_standard_version": "IS 1786:2008 (incorporating Amendments No. 1 & 2)",
+    "qco_clause_standard_applicability": "The latest version of Indian Standards including the amendments issued thereof, as notified by the Bureau of Indian Standards from time to time, shall apply from the date of such notification.",
     "evidence_source_title": "Ministry of Steel Quality Control Orders - Compulsory BIS Certification",
     "evidence_source_url": "https://steel.gov.in/en/quality-control-orders",
     "evidence_source_type": "GAZETTE_NOTIFICATION",
-    "notes": "Compulsory certification under Scheme-I for manufacture, import, and sale of high strength deformed steel bars and wires for concrete reinforcement (TMT bars).",
-    "last_verified": "2026-09-08"
+    "notes": "Compulsory certification under Scheme-I for manufacture, import, and sale of high strength deformed steel bars and wires for concrete reinforcement (TMT bars). Prohibits manufacture, import, distribution, or sale without the Standard Mark.",
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2012-03-12",
+        "event_type": "PREDECESSOR_QCO",
+        "title": "Steel and Steel Products (Quality Control) Order, 2012",
+        "description": "Earlier Quality Control Order under S.O. 464(E) initially introduced mandatory BIS certification for IS 1786.",
+        "reference_doc": "S.O. 464(E)",
+        "source_url": "https://steel.gov.in/en/quality-control-orders"
+      },
+      {
+        "event_date": "2020-05-27",
+        "event_type": "SUPERSEDING_QCO",
+        "title": "Steel and Steel Products (Quality Control) Order, 2020",
+        "description": "Ministry of Steel notified comprehensive consolidated QCO making BIS certification mandatory under Scheme I for IS 1786:2008.",
+        "reference_doc": "S.O. 1673(E)",
+        "source_url": "https://steel.gov.in/en/quality-control-orders"
+      }
+    ]
   },
   {
     "standard_number": "IS 2062:2011",
@@ -23,11 +44,32 @@
     "qco_title": "Steel and Steel Products (Quality Control) Order, 2020",
     "issuing_authority": "Ministry of Steel, Government of India",
     "enforcement_date": "2020-05-27",
-    "evidence_source_title": "Ministry of Steel Quality Control Orders - Compulsory BIS Certification",
+    "referenced_standard_edition": "IS 2062:2011",
+    "latest_standard_version": "IS 2062:2011 (incorporating Amendment No. 1)",
+    "qco_clause_standard_applicability": "The latest version of Indian Standards including the amendments issued thereof, as notified by the Bureau of Indian Standards from time to time, shall apply.",
+    "evidence_source_title": "Ministry of Steel QCO Schedule for Structural Steel",
     "evidence_source_url": "https://steel.gov.in/en/quality-control-orders",
     "evidence_source_type": "GAZETTE_NOTIFICATION",
     "notes": "Mandatory ISI mark compliance under Scheme-I for hot rolled medium and high tensile structural steel plates, shapes, sections, and bars.",
-    "last_verified": "2026-09-08"
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2015-12-15",
+        "event_type": "PREDECESSOR_QCO",
+        "title": "Steel and Steel Products (Quality Control) Second Order, 2015",
+        "description": "Earlier QCO covering structural steel grades under IS 2062.",
+        "reference_doc": "S.O. 3447(E)",
+        "source_url": "https://steel.gov.in/en/quality-control-orders"
+      },
+      {
+        "event_date": "2020-05-27",
+        "event_type": "SUPERSEDING_QCO",
+        "title": "Steel and Steel Products (Quality Control) Order, 2020",
+        "description": "Consolidated Steel QCO 2020 confirmed mandatory Scheme I certification for IS 2062.",
+        "reference_doc": "S.O. 1673(E)",
+        "source_url": "https://steel.gov.in/en/quality-control-orders"
+      }
+    ]
   },
   {
     "standard_number": "IS 456:2000",
@@ -38,116 +80,227 @@
     "qco_title": null,
     "issuing_authority": "Bureau of Indian Standards",
     "enforcement_date": null,
+    "referenced_standard_edition": "IS 456:2000 (Fourth Revision, Reaffirmed 2005)",
+    "latest_standard_version": "IS 456:2000 (incorporating Amendment No. 1)",
+    "qco_clause_standard_applicability": null,
     "evidence_source_title": "BIS Standardization Guidelines for Engineering Design Codes",
     "evidence_source_url": "https://standards.bis.gov.in/",
     "evidence_source_type": "BIS_CATALOG",
-    "notes": "IS 456 is an engineering design code of practice for structural concrete, not an industrial manufactured item subject to product mark certification.",
-    "last_verified": "2026-09-08"
+    "notes": "IS 456 is an engineering design code of practice for structural concrete calculations; it is not an industrial manufactured item subject to product mark licensing.",
+    "last_verified": "2026-09-08",
+    "events": []
   },
   {
     "standard_number": "IS 269:2015",
     "certification_status": "MANDATORY",
     "certification_scheme": "Scheme I (ISI Mark Scheme)",
     "qco_status": "APPLICABLE",
-    "qco_reference": "S.O. 407(E) / Cement (Quality Control) Order, 2003 as amended",
+    "qco_reference": "S.O. 407(E) / Cement (Quality Control) Order",
     "qco_title": "Cement (Quality Control) Order",
     "issuing_authority": "Department for Promotion of Industry and Internal Trade (DPIIT), Ministry of Commerce and Industry",
     "enforcement_date": "2003-02-17",
-    "evidence_source_title": "BIS Compulsory Certification List - Scheme I (Cement)",
+    "referenced_standard_edition": "IS 269:2015",
+    "latest_standard_version": "IS 269:2015 (Sixth Revision)",
+    "qco_clause_standard_applicability": "Latest version and amendments as notified by the Bureau of Indian Standards from time to time shall apply.",
+    "evidence_source_title": "BIS Products Under Compulsory Certification - Scheme I (Cement)",
     "evidence_source_url": "https://www.bis.gov.in/product-certification/products-under-compulsory-certification/",
     "evidence_source_type": "QCO_ORDER",
-    "notes": "All varieties and grades of ordinary Portland cement require mandatory BIS certification (ISI mark) prior to manufacture, storage, sale, or distribution in India.",
-    "last_verified": "2026-09-08"
+    "notes": "Mandatory BIS certification (ISI Mark) for 33, 43, and 53 grade ordinary Portland cement. Manufacturing, distribution, or commercial sale without BIS license is prohibited.",
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2003-02-17",
+        "event_type": "INITIAL_QCO",
+        "title": "Cement (Quality Control) Order, 2003",
+        "description": "Notified compulsory certification under Scheme I for all grades of cement.",
+        "reference_doc": "S.O. 407(E)",
+        "source_url": "https://dpiit.gov.in/quality-control-orders"
+      },
+      {
+        "event_date": "2015-08-01",
+        "event_type": "REVISED_STANDARD",
+        "title": "Publication of Consolidated IS 269:2015",
+        "description": "BIS published IS 269:2015 consolidating earlier separate 33, 43, and 53 grade standards under a single unified specification.",
+        "reference_doc": "BIS Gazette Notification",
+        "source_url": "https://standards.bis.gov.in/"
+      }
+    ]
   },
   {
     "standard_number": "IS 694:2010",
     "certification_status": "MANDATORY",
     "certification_scheme": "Scheme I (ISI Mark Scheme)",
     "qco_status": "APPLICABLE",
-    "qco_reference": "Electrical Wires, Cables, Appliances and Protection Devices and Accessories (Quality Control) Order, 2003",
-    "qco_title": "Electrical Wires, Cables, Appliances and Protection Devices (Quality Control) Order",
+    "qco_reference": "Electrical Wires, Cables, Appliances and Protection Devices and Accessories (Quality Control) Order, 2003 / Electrical Wires and Cables QCO, 2023",
+    "qco_title": "Electrical Wires and Cables (Quality Control) Order",
     "issuing_authority": "Department for Promotion of Industry and Internal Trade (DPIIT), Ministry of Commerce and Industry",
     "enforcement_date": "2003-02-17",
-    "evidence_source_title": "BIS Mandatory Certification List - Low Voltage Cables",
+    "referenced_standard_edition": "IS 694:2010",
+    "latest_standard_version": "IS 694:2010 (Fourth Revision)",
+    "qco_clause_standard_applicability": "Latest version and amendments as notified by the Bureau of Indian Standards from time to time shall apply.",
+    "evidence_source_title": "BIS Compulsory Certification List - Low Voltage Cables",
     "evidence_source_url": "https://www.bis.gov.in/product-certification/products-under-compulsory-certification/",
     "evidence_source_type": "QCO_ORDER",
-    "notes": "Mandatory ISI marking under Scheme I for PVC insulated electrical cables up to and including 450/750 V.",
-    "last_verified": "2026-09-08"
+    "notes": "Mandatory ISI mark compliance under Scheme I for PVC insulated electrical cables up to 450/750 V.",
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2003-02-17",
+        "event_type": "INITIAL_QCO",
+        "title": "Electrical Wires and Cables QCO 2003",
+        "description": "Enforced compulsory ISI mark for low-voltage PVC insulated domestic and industrial wiring.",
+        "reference_doc": "S.O. 189(E)",
+        "source_url": "https://dpiit.gov.in/quality-control-orders"
+      }
+    ]
   },
   {
     "standard_number": "IS 7098 (Part 1):1988",
     "certification_status": "MANDATORY",
     "certification_scheme": "Scheme I (ISI Mark Scheme)",
     "qco_status": "APPLICABLE",
-    "qco_reference": "Electrical Wires, Cables, Appliances and Protection Devices and Accessories (Quality Control) Order, 2003",
-    "qco_title": "Electrical Wires, Cables, Appliances and Protection Devices (Quality Control) Order",
+    "qco_reference": "Electrical Wires and Cables (Quality Control) Order",
+    "qco_title": "Electrical Wires and Cables (Quality Control) Order",
     "issuing_authority": "Department for Promotion of Industry and Internal Trade (DPIIT), Ministry of Commerce and Industry",
     "enforcement_date": "2003-02-17",
+    "referenced_standard_edition": "IS 7098 (Part 1):1988",
+    "latest_standard_version": "IS 7098 (Part 1):1988 (incorporating Amendments No. 1 & 2, Reaffirmed 2004)",
+    "qco_clause_standard_applicability": "Latest version and amendments as notified by the Bureau of Indian Standards from time to time shall apply.",
     "evidence_source_title": "BIS Compulsory Certification Scheme - Power Cables",
     "evidence_source_url": "https://www.bis.gov.in/product-certification/products-under-compulsory-certification/",
     "evidence_source_type": "QCO_ORDER",
     "notes": "Mandatory ISI marking under Scheme I for crosslinked polyethylene (XLPE) insulated power cables for working voltages up to 1.1 kV.",
-    "last_verified": "2026-09-08"
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2003-02-17",
+        "event_type": "INITIAL_QCO",
+        "title": "Electrical Wires and Cables QCO 2003",
+        "description": "Mandatory certification under Scheme I for XLPE power cables up to 1.1 kV.",
+        "reference_doc": "S.O. 189(E)",
+        "source_url": "https://dpiit.gov.in/quality-control-orders"
+      }
+    ]
   },
   {
     "standard_number": "IS 1554 (Part 1):1988",
     "certification_status": "MANDATORY",
     "certification_scheme": "Scheme I (ISI Mark Scheme)",
     "qco_status": "APPLICABLE",
-    "qco_reference": "Electrical Wires, Cables, Appliances and Protection Devices and Accessories (Quality Control) Order, 2003",
-    "qco_title": "Electrical Wires, Cables, Appliances and Protection Devices (Quality Control) Order",
+    "qco_reference": "Electrical Wires and Cables (Quality Control) Order",
+    "qco_title": "Electrical Wires and Cables (Quality Control) Order",
     "issuing_authority": "Department for Promotion of Industry and Internal Trade (DPIIT), Ministry of Commerce and Industry",
     "enforcement_date": "2003-02-17",
+    "referenced_standard_edition": "IS 1554 (Part 1):1988",
+    "latest_standard_version": "IS 1554 (Part 1):1988 (incorporating Amendment No. 1)",
+    "qco_clause_standard_applicability": "Latest version and amendments as notified by the Bureau of Indian Standards from time to time shall apply.",
     "evidence_source_title": "BIS Compulsory Certification Scheme - Heavy Duty PVC Cables",
     "evidence_source_url": "https://www.bis.gov.in/product-certification/products-under-compulsory-certification/",
     "evidence_source_type": "QCO_ORDER",
-    "notes": "Compulsory conformity under Scheme I for heavy duty PVC insulated electric cables up to 1100 V.",
-    "last_verified": "2026-09-08"
+    "notes": "Mandatory Scheme I certification for heavy duty PVC insulated power cables up to 1100 V.",
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2003-02-17",
+        "event_type": "INITIAL_QCO",
+        "title": "Electrical Wires and Cables QCO 2003",
+        "description": "Mandated Scheme I ISI marking for heavy duty PVC insulated electric cables.",
+        "reference_doc": "S.O. 189(E)",
+        "source_url": "https://dpiit.gov.in/quality-control-orders"
+      }
+    ]
   },
   {
     "standard_number": "IS 1239 (Part 1):2004",
     "certification_status": "MANDATORY",
     "certification_scheme": "Scheme I (ISI Mark Scheme)",
     "qco_status": "APPLICABLE",
-    "qco_reference": "Steel and Steel Products (Quality Control) Order, 2020 / S.O. 1673(E)",
+    "qco_reference": "S.O. 1673(E) / Steel and Steel Products (Quality Control) Order, 2020",
     "qco_title": "Steel and Steel Products (Quality Control) Order, 2020",
     "issuing_authority": "Ministry of Steel, Government of India",
     "enforcement_date": "2020-05-27",
+    "referenced_standard_edition": "IS 1239 (Part 1):2004",
+    "latest_standard_version": "IS 1239 (Part 1):2004 (Sixth Revision)",
+    "qco_clause_standard_applicability": "The latest version of Indian Standards including amendments issued thereof, as notified by BIS from time to time, shall apply.",
     "evidence_source_title": "Ministry of Steel QCO Schedule for Steel Tubes and Pipes",
     "evidence_source_url": "https://steel.gov.in/en/quality-control-orders",
     "evidence_source_type": "GAZETTE_NOTIFICATION",
-    "notes": "Compulsory ISI mark certification under Scheme I for mild steel tubes, tubulars, and other wrought steel fittings.",
-    "last_verified": "2026-09-08"
+    "notes": "Mandatory ISI mark compliance under Scheme I for mild steel tubes, tubulars, and other wrought steel fittings.",
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2020-05-27",
+        "event_type": "SUPERSEDING_QCO",
+        "title": "Steel and Steel Products (Quality Control) Order, 2020",
+        "description": "Notified compulsory certification under Scheme I for mild steel tubes.",
+        "reference_doc": "S.O. 1673(E)",
+        "source_url": "https://steel.gov.in/en/quality-control-orders"
+      }
+    ]
   },
   {
     "standard_number": "IS 4984:2016",
     "certification_status": "MANDATORY",
     "certification_scheme": "Scheme I (ISI Mark Scheme)",
     "qco_status": "APPLICABLE",
-    "qco_reference": "Pipes and Fittings (Quality Control) Order, 2023 / S.O. 4668(E)",
+    "qco_reference": "S.O. 4668(E) / Pipes and Fittings (Quality Control) Order, 2023",
     "qco_title": "Pipes and Fittings (Quality Control) Order, 2023",
     "issuing_authority": "Department for Promotion of Industry and Internal Trade (DPIIT), Ministry of Commerce and Industry",
     "enforcement_date": "2024-04-23",
+    "referenced_standard_edition": "IS 4984:2016",
+    "latest_standard_version": "IS 4984:2016 (Fifth Revision)",
+    "qco_clause_standard_applicability": "Latest version and amendments as notified by the Bureau of Indian Standards from time to time shall apply.",
     "evidence_source_title": "DPIIT Quality Control Order on Pipes and Fittings",
     "evidence_source_url": "https://dpiit.gov.in/quality-control-orders",
     "evidence_source_type": "GAZETTE_NOTIFICATION",
-    "notes": "Compulsory conformity under Scheme I for high density polyethylene (HDPE) water supply piping systems.",
-    "last_verified": "2026-09-08"
+    "notes": "Compulsory conformity under Scheme I for HDPE water supply piping systems.",
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2023-10-23",
+        "event_type": "INITIAL_QCO",
+        "title": "Pipes and Fittings (Quality Control) Order, 2023",
+        "description": "DPIIT notified compulsory certification under Scheme I for HDPE water supply pipes conforming to IS 4984:2016.",
+        "reference_doc": "S.O. 4668(E)",
+        "source_url": "https://dpiit.gov.in/quality-control-orders"
+      },
+      {
+        "event_date": "2024-04-23",
+        "event_type": "ENFORCEMENT",
+        "title": "Enforcement of HDPE Pipe QCO",
+        "description": "Mandatory BIS licensing enforced for manufacturing and distribution.",
+        "reference_doc": "S.O. 4668(E)",
+        "source_url": "https://dpiit.gov.in/quality-control-orders"
+      }
+    ]
   },
   {
     "standard_number": "IS 3589:2001",
     "certification_status": "MANDATORY",
     "certification_scheme": "Scheme I (ISI Mark Scheme)",
     "qco_status": "APPLICABLE",
-    "qco_reference": "Steel and Steel Products (Quality Control) Order, 2020 / S.O. 1673(E)",
+    "qco_reference": "S.O. 1673(E) / Steel and Steel Products (Quality Control) Order, 2020",
     "qco_title": "Steel and Steel Products (Quality Control) Order, 2020",
     "issuing_authority": "Ministry of Steel, Government of India",
     "enforcement_date": "2020-05-27",
+    "referenced_standard_edition": "IS 3589:2001",
+    "latest_standard_version": "IS 3589:2001 (incorporating Amendment No. 1)",
+    "qco_clause_standard_applicability": "The latest version of Indian Standards including amendments issued thereof, as notified by BIS from time to time, shall apply.",
     "evidence_source_title": "Ministry of Steel Quality Control Orders",
     "evidence_source_url": "https://steel.gov.in/en/quality-control-orders",
     "evidence_source_type": "GAZETTE_NOTIFICATION",
     "notes": "Compulsory Scheme I certification for large diameter seamless or electrically welded steel pipes for water, gas, and sewage.",
-    "last_verified": "2026-09-08"
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2020-05-27",
+        "event_type": "SUPERSEDING_QCO",
+        "title": "Steel and Steel Products (Quality Control) Order, 2020",
+        "description": "Comprehensive order mandating Scheme I ISI mark for IS 3589 steel pipes.",
+        "reference_doc": "S.O. 1673(E)",
+        "source_url": "https://steel.gov.in/en/quality-control-orders"
+      }
+    ]
   },
   {
     "standard_number": "IS 2925:1984",
@@ -158,26 +311,84 @@
     "qco_title": "Personal Protective Equipment — Industrial Safety Helmets (Quality Control) Order",
     "issuing_authority": "Department for Promotion of Industry and Internal Trade (DPIIT), Ministry of Commerce and Industry",
     "enforcement_date": "2021-11-23",
+    "referenced_standard_edition": "IS 2925:1984",
+    "latest_standard_version": "IS 2925:1984 (Second Revision, Reaffirmed 2011)",
+    "qco_clause_standard_applicability": "Latest version and amendments as notified by the Bureau of Indian Standards from time to time shall apply.",
     "evidence_source_title": "DPIIT Personal Protective Equipment QCO Notification",
     "evidence_source_url": "https://dpiit.gov.in/quality-control-orders",
     "evidence_source_type": "GAZETTE_NOTIFICATION",
     "notes": "Mandatory ISI marking under Scheme I for industrial safety helmets.",
-    "last_verified": "2026-09-08"
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2021-05-23",
+        "event_type": "INITIAL_QCO",
+        "title": "Industrial Safety Helmets (Quality Control) Order, 2021",
+        "description": "DPIIT notified compulsory certification under Scheme I for IS 2925.",
+        "reference_doc": "S.O. 2025(E)",
+        "source_url": "https://dpiit.gov.in/quality-control-orders"
+      },
+      {
+        "event_date": "2021-11-23",
+        "event_type": "ENFORCEMENT",
+        "title": "Safety Helmet QCO Enforcement",
+        "description": "Compulsory certification came into force across India.",
+        "reference_doc": "S.O. 2025(E)",
+        "source_url": "https://dpiit.gov.in/quality-control-orders"
+      }
+    ]
   },
   {
     "standard_number": "IS 15298 (Part 2):2016",
     "certification_status": "MANDATORY",
     "certification_scheme": "Scheme I (ISI Mark Scheme)",
     "qco_status": "APPLICABLE",
-    "qco_reference": "Footwear made from Leather and other materials (Quality Control) Order, 2020 / S.O. 3860(E)",
-    "qco_title": "Footwear made from Leather and other materials (Quality Control) Order, 2020",
+    "qco_reference": "S.O. 3860(E) / Footwear made from Leather and other materials (Quality Control) Order, 2020",
+    "qco_title": "Personal Protective Equipment — Footwear (Quality Control) Order, 2020",
     "issuing_authority": "Department for Promotion of Industry and Internal Trade (DPIIT), Ministry of Commerce and Industry",
     "enforcement_date": "2021-07-01",
-    "evidence_source_title": "DPIIT Footwear Quality Control Order",
+    "referenced_standard_edition": "IS 15298 (Part 2):2016",
+    "latest_standard_version": "IS 15298 (Part 2):2024 (Third Revision)",
+    "qco_clause_standard_applicability": "The latest version of Indian Standards including the amendments issued thereof, as notified by the Bureau of Indian Standards from time to time, shall apply.",
+    "evidence_source_title": "DPIIT Footwear Quality Control Order & BIS Implementation Circulars",
     "evidence_source_url": "https://dpiit.gov.in/quality-control-orders",
     "evidence_source_type": "GAZETTE_NOTIFICATION",
-    "notes": "Mandatory BIS certification (Scheme I) for personal protective equipment safety footwear.",
-    "last_verified": "2026-09-08"
+    "notes": "Mandatory BIS certification (Scheme I) for industrial safety footwear. The 2020 QCO initially referenced the 2016 edition (IS 15298 (Part 2):2016). BIS notified the revised Third Revision (IS 15298 (Part 2):2024) in 2024 with transition guidelines issued in January 2025; standard QCO rules apply the latest notified version.",
+    "last_verified": "2026-09-08",
+    "events": [
+      {
+        "event_date": "2020-10-27",
+        "event_type": "INITIAL_QCO",
+        "title": "Footwear (Quality Control) Order, 2020",
+        "description": "DPIIT notified compulsory certification under Scheme I for safety footwear conforming to IS 15298 (Part 2):2016.",
+        "reference_doc": "S.O. 3860(E)",
+        "source_url": "https://dpiit.gov.in/quality-control-orders"
+      },
+      {
+        "event_date": "2021-07-01",
+        "event_type": "ENFORCEMENT",
+        "title": "Enforcement of Footwear QCO",
+        "description": "Mandatory BIS certification enforced for manufacturers and importers.",
+        "reference_doc": "S.O. 3860(E)",
+        "source_url": "https://dpiit.gov.in/quality-control-orders"
+      },
+      {
+        "event_date": "2024-06-15",
+        "event_type": "REVISED_STANDARD",
+        "title": "Publication of Revised Standard IS 15298 (Part 2):2024",
+        "description": "BIS notified the Third Revision of the safety footwear standard (IS 15298 (Part 2):2024) replacing the 2016 edition.",
+        "reference_doc": "BIS Gazette Notification",
+        "source_url": "https://standards.bis.gov.in/"
+      },
+      {
+        "event_date": "2025-01-22",
+        "event_type": "IMPLEMENTATION_GUIDELINE",
+        "title": "BIS Guidelines for Implementation of IS 15298 (Part 2):2024",
+        "description": "BIS issued transition and concurrent running guidelines for existing licensees and new applicants.",
+        "reference_doc": "BIS CMD-III Circular / Product Manual",
+        "source_url": "https://www.bis.gov.in/product-certification/product-manuals/"
+      }
+    ]
   },
   {
     "standard_number": "IS 800:2007",
@@ -188,11 +399,15 @@
     "qco_title": null,
     "issuing_authority": "Bureau of Indian Standards",
     "enforcement_date": null,
+    "referenced_standard_edition": "IS 800:2007 (Third Revision)",
+    "latest_standard_version": "IS 800:2007 (incorporating Amendment No. 1)",
+    "qco_clause_standard_applicability": null,
     "evidence_source_title": "BIS Standardization Guidelines for Structural Steel Design",
     "evidence_source_url": "https://standards.bis.gov.in/",
     "evidence_source_type": "BIS_CATALOG",
-    "notes": "IS 800 is an engineering structural design code of practice, not an industrial manufactured item subject to ISI product marking.",
-    "last_verified": "2026-09-08"
+    "notes": "IS 800 is an engineering structural design code of practice (limit state design for steel structures); not an industrial manufactured item subject to ISI product marking.",
+    "last_verified": "2026-09-08",
+    "events": []
   },
   {
     "standard_number": "IS 10262:2019",
@@ -203,11 +418,15 @@
     "qco_title": null,
     "issuing_authority": "Bureau of Indian Standards",
     "enforcement_date": null,
+    "referenced_standard_edition": "IS 10262:2019 (Second Revision)",
+    "latest_standard_version": "IS 10262:2019",
+    "qco_clause_standard_applicability": null,
     "evidence_source_title": "BIS Guidelines for Concrete Mix Design",
     "evidence_source_url": "https://standards.bis.gov.in/",
     "evidence_source_type": "BIS_CATALOG",
-    "notes": "IS 10262 is a set of technical guidelines for concrete mix proportioning calculations and testing.",
-    "last_verified": "2026-09-08"
+    "notes": "IS 10262 provides empirical guidelines and calculation steps for concrete mix proportioning; not an ISI license product.",
+    "last_verified": "2026-09-08",
+    "events": []
   },
   {
     "standard_number": "IS 1077:2020",
@@ -218,10 +437,14 @@
     "qco_title": null,
     "issuing_authority": "Bureau of Indian Standards",
     "enforcement_date": null,
+    "referenced_standard_edition": "IS 1077:2020 (Sixth Revision)",
+    "latest_standard_version": "IS 1077:2020",
+    "qco_clause_standard_applicability": null,
     "evidence_source_title": "BIS Product Certification Voluntary Scheme Registry",
     "evidence_source_url": "https://standards.bis.gov.in/",
     "evidence_source_type": "BIS_CATALOG",
     "notes": "BIS certification mark scheme is available on a voluntary basis; no mandatory QCO order identified in curated regulatory repository.",
-    "last_verified": "2026-09-08"
+    "last_verified": "2026-09-08",
+    "events": []
   }
 ]

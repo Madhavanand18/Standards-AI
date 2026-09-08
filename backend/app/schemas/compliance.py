@@ -19,6 +19,19 @@ class QCOStatus(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
+class ComplianceEvent(BaseModel):
+    """
+    Represents a specific regulatory or version transition milestone in a standard's compliance history.
+    """
+    id: int | None = None
+    event_date: str | None = None
+    event_type: str  # e.g., INITIAL_QCO, AMENDMENT, EXTENSION, REVISED_STANDARD, IMPLEMENTATION_GUIDELINE
+    title: str
+    description: str | None = None
+    reference_doc: str | None = None
+    source_url: str | None = None
+
+
 class StandardCompliance(BaseModel):
     """
     Verified regulatory compliance and Quality Control Order (QCO) metadata for a BIS standard.
@@ -33,15 +46,33 @@ class StandardCompliance(BaseModel):
     qco_title: str | None = None
     issuing_authority: str | None = None
     enforcement_date: str | None = None
+    referenced_standard_edition: str | None = None
+    latest_standard_version: str | None = None
+    qco_clause_standard_applicability: str | None = None
     evidence_source_title: str | None = None
     evidence_source_url: str | None = None
     evidence_source_type: str | None = None
     notes: str | None = None
     last_verified: str | None = None
+    events: list[ComplianceEvent] = Field(default_factory=list)
 
     @classmethod
     def from_db_row(cls, row: dict[str, Any]) -> "StandardCompliance":
         """Construct from SQLite query dictionary."""
+        events_raw = row.get("events") or []
+        events = [
+            ComplianceEvent(
+                id=e.get("id"),
+                event_date=e.get("event_date"),
+                event_type=e.get("event_type", "GENERAL"),
+                title=e.get("title", ""),
+                description=e.get("description"),
+                reference_doc=e.get("reference_doc"),
+                source_url=e.get("source_url"),
+            )
+            for e in events_raw
+        ]
+
         return cls(
             standard_id=row.get("standard_id"),
             standard_number=row["standard_number"],
@@ -52,9 +83,13 @@ class StandardCompliance(BaseModel):
             qco_title=row.get("qco_title"),
             issuing_authority=row.get("issuing_authority"),
             enforcement_date=row.get("enforcement_date"),
+            referenced_standard_edition=row.get("referenced_standard_edition"),
+            latest_standard_version=row.get("latest_standard_version"),
+            qco_clause_standard_applicability=row.get("qco_clause_standard_applicability"),
             evidence_source_title=row.get("evidence_source_title"),
             evidence_source_url=row.get("evidence_source_url"),
             evidence_source_type=row.get("evidence_source_type"),
             notes=row.get("notes"),
             last_verified=row.get("last_verified"),
+            events=events,
         )
