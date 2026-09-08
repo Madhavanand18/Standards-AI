@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 def seed_database(
     seed_file_path: Path | str | None = None,
     seed_rel_path: Path | str | None = None,
+    seed_lifecycle_path: Path | str | None = None,
     db_path: Path | str | None = None,
     reset: bool = False
 ) -> int:
@@ -20,6 +21,7 @@ def seed_database(
         raise FileNotFoundError(f"Seed file not found at: {seed_path}")
 
     rel_path = Path(seed_rel_path or settings.SEED_RELATIONSHIPS_PATH)
+    lc_path = Path(seed_lifecycle_path or settings.SEED_LIFECYCLE_PATH)
 
     init_db(db_path)
 
@@ -31,7 +33,9 @@ def seed_database(
     count = 0
     with get_db_cursor(db_path) as cursor:
         if reset:
-            logger.warning("Reset flag is true. Clearing existing standards and relationships...")
+            logger.warning("Reset flag is true. Clearing existing data...")
+            cursor.execute("DELETE FROM standard_amendments;")
+            cursor.execute("DELETE FROM standard_lifecycle;")
             cursor.execute("DELETE FROM standard_relationships;")
             cursor.execute("DELETE FROM standards;")
 
@@ -40,7 +44,6 @@ def seed_database(
             if isinstance(keywords_val, (list, dict)):
                 keywords_val = json.dumps(keywords_val, ensure_ascii=False)
 
-            # Insert or ignore / update
             cursor.execute(
                 """
                 INSERT INTO standards (
@@ -83,6 +86,83 @@ def seed_database(
         cursor.execute("SELECT id, standard_number FROM standards")
         mapping = {row["standard_number"]: row["id"] for row in cursor.fetchall()}
 
+        # Load and seed lifecycle metadata
+        lc_count = 0
+        amd_count = 0
+        if lc_path.exists():
+            with open(lc_path, "r", encoding="utf-8") as lf:
+                lifecycle_data: list[dict[str, Any]] = json.load(lf)
+
+            # Cleanly sync lifecycle tables
+            cursor.execute("DELETE FROM standard_amendments;")
+            cursor.execute("DELETE FROM standard_lifecycle;")
+
+            for lc in lifecycle_data:
+                std_num = lc["standard_number"]
+                if std_num not in mapping:
+                    logger.warning(f"Lifecycle entry for unknown standard: {std_num} — skipped")
+                    continue
+
+                std_id = mapping[std_num]
+                cursor.execute(
+                    """
+                    INSERT INTO standard_lifecycle (
+                        standard_id, lifecycle_status, reaffirmed_year, reviewed_year,
+                        amendment_count, supersedes, superseded_by, source_url,
+                        verification_date, verification_note
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(standard_id) DO UPDATE SET
+                        lifecycle_status = excluded.lifecycle_status,
+                        reaffirmed_year = excluded.reaffirmed_year,
+                        reviewed_year = excluded.reviewed_year,
+                        amendment_count = excluded.amendment_count,
+                        supersedes = excluded.supersedes,
+                        superseded_by = excluded.superseded_by,
+                        source_url = excluded.source_url,
+                        verification_date = excluded.verification_date,
+                        verification_note = excluded.verification_note,
+                        updated_at = CURRENT_TIMESTAMP;
+                    """,
+                    (
+                        std_id,
+                        lc.get("lifecycle_status", "UNKNOWN"),
+                        lc.get("reaffirmed_year"),
+                        lc.get("reviewed_year"),
+                        lc.get("amendment_count", 0),
+                        lc.get("supersedes"),
+                        lc.get("superseded_by"),
+                        lc.get("source_url"),
+                        lc.get("verification_date"),
+                        lc.get("verification_note"),
+                    )
+                )
+                lc_count += 1
+
+                # Seed amendments
+                for amd in lc.get("amendments", []):
+                    cursor.execute(
+                        """
+                        INSERT INTO standard_amendments (
+                            standard_id, amendment_number, year, description,
+                            source_url, verification_date
+                        ) VALUES (?, ?, ?, ?, ?, ?)
+                        ON CONFLICT(standard_id, amendment_number) DO UPDATE SET
+                            year = excluded.year,
+                            description = excluded.description,
+                            source_url = excluded.source_url,
+                            verification_date = excluded.verification_date;
+                        """,
+                        (
+                            std_id,
+                            amd["amendment_number"],
+                            amd.get("year"),
+                            amd.get("description"),
+                            amd.get("source_url"),
+                            amd.get("verification_date"),
+                        )
+                    )
+                    amd_count += 1
+
         # Load relationships from curated JSON file if available
         relationships_to_seed = []
         if rel_path.exists():
@@ -123,7 +203,11 @@ def seed_database(
                 )
                 rel_count += 1
 
-    logger.info(f"Database successfully populated with {count} standards and {rel_count} relationships.")
+    logger.info(
+        f"Database successfully populated with {count} standards, "
+        f"{lc_count} lifecycle records, {amd_count} amendments, "
+        f"and {rel_count} relationships."
+    )
     return count
 
 
@@ -133,4 +217,5 @@ if __name__ == "__main__":
     parser.add_argument("--reset", action="store_true", help="Clear existing data before seeding")
     args = parser.parse_args()
     seed_database(reset=args.reset)
+
 

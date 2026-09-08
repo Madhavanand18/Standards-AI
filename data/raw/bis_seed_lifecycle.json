@@ -1,0 +1,297 @@
+[
+  {
+    "standard_number": "IS 1786:2008",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2008,
+    "edition": "Fourth Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 2,
+    "supersedes": "IS 1786:1985",
+    "superseded_by": null,
+    "amendments": [
+      {
+        "amendment_number": 1,
+        "year": 2012,
+        "description": "Amendment No.1 modifying clause for Fe 500D, Fe 550D chemical composition and mechanical properties.",
+        "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1786",
+        "verification_date": "2026-09-08"
+      },
+      {
+        "amendment_number": 2,
+        "year": 2018,
+        "description": "Amendment No.2 related to Fe 600 grade properties and test requirements.",
+        "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1786",
+        "verification_date": "2026-09-08"
+      }
+    ],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1786",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal search. Amendment count based on BIS catalog listing."
+  },
+  {
+    "standard_number": "IS 2062:2011",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2011,
+    "edition": "Seventh Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 1,
+    "supersedes": "IS 2062:2006",
+    "superseded_by": null,
+    "amendments": [
+      {
+        "amendment_number": 1,
+        "year": 2013,
+        "description": "Amendment No.1 to IS 2062:2011 covering additional grades and technical corrections.",
+        "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+2062",
+        "verification_date": "2026-09-08"
+      }
+    ],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+2062",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Seventh revision of the standard."
+  },
+  {
+    "standard_number": "IS 456:2000",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2000,
+    "edition": "Fourth Revision",
+    "reaffirmed_year": 2005,
+    "reviewed_year": null,
+    "amendment_count": 1,
+    "supersedes": "IS 456:1978",
+    "superseded_by": null,
+    "amendments": [
+      {
+        "amendment_number": 1,
+        "year": 2001,
+        "description": "Amendment No.1 to IS 456:2000 with errata and corrections to clauses.",
+        "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+456",
+        "verification_date": "2026-09-08"
+      }
+    ],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+456",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Reaffirmed in 2005 per BIS catalog."
+  },
+  {
+    "standard_number": "IS 269:2015",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2015,
+    "edition": "Sixth Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 0,
+    "supersedes": "IS 269:1989",
+    "superseded_by": null,
+    "amendments": [],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+269",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Sixth revision consolidating earlier cement specifications."
+  },
+  {
+    "standard_number": "IS 694:2010",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2010,
+    "edition": "Fourth Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 0,
+    "supersedes": "IS 694:1990",
+    "superseded_by": null,
+    "amendments": [],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+694",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Fourth revision of PVC cable standard."
+  },
+  {
+    "standard_number": "IS 7098 (Part 1):1988",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 1988,
+    "edition": "First Revision",
+    "reaffirmed_year": 2004,
+    "reviewed_year": null,
+    "amendment_count": 2,
+    "supersedes": "IS 7098 (Part 1):1973",
+    "superseded_by": null,
+    "amendments": [
+      {
+        "amendment_number": 1,
+        "year": 1999,
+        "description": "Amendment No.1 to IS 7098 (Part 1):1988 for XLPE cable conductor and insulation requirements.",
+        "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+7098",
+        "verification_date": "2026-09-08"
+      },
+      {
+        "amendment_number": 2,
+        "year": 2003,
+        "description": "Amendment No.2 to IS 7098 (Part 1):1988 for test requirements update.",
+        "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+7098",
+        "verification_date": "2026-09-08"
+      }
+    ],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+7098",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Reaffirmed in 2004 per BIS catalog."
+  },
+  {
+    "standard_number": "IS 1554 (Part 1):1988",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 1988,
+    "edition": "Third Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 1,
+    "supersedes": "IS 1554 (Part 1):1976",
+    "superseded_by": null,
+    "amendments": [
+      {
+        "amendment_number": 1,
+        "year": 2001,
+        "description": "Amendment No.1 to IS 1554 (Part 1):1988 for PVC insulation properties update.",
+        "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1554",
+        "verification_date": "2026-09-08"
+      }
+    ],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1554",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal."
+  },
+  {
+    "standard_number": "IS 1239 (Part 1):2004",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2004,
+    "edition": "Sixth Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 0,
+    "supersedes": "IS 1239 (Part 1):1990",
+    "superseded_by": null,
+    "amendments": [],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1239",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Sixth revision."
+  },
+  {
+    "standard_number": "IS 4984:2016",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2016,
+    "edition": "Fifth Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 0,
+    "supersedes": "IS 4984:1995",
+    "superseded_by": null,
+    "amendments": [],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+4984",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Fifth revision for HDPE pipe standard."
+  },
+  {
+    "standard_number": "IS 3589:2001",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2001,
+    "edition": "Third Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 1,
+    "supersedes": "IS 3589:1991",
+    "superseded_by": null,
+    "amendments": [
+      {
+        "amendment_number": 1,
+        "year": 2007,
+        "description": "Amendment No.1 to IS 3589:2001 for steel grade and test requirements update.",
+        "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+3589",
+        "verification_date": "2026-09-08"
+      }
+    ],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+3589",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal."
+  },
+  {
+    "standard_number": "IS 2925:1984",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 1984,
+    "edition": "Second Revision",
+    "reaffirmed_year": 2011,
+    "reviewed_year": null,
+    "amendment_count": 0,
+    "supersedes": "IS 2925:1975",
+    "superseded_by": null,
+    "amendments": [],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+2925",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Reaffirmed 2011 per BIS catalog."
+  },
+  {
+    "standard_number": "IS 15298 (Part 2):2016",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2016,
+    "edition": "Second Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 0,
+    "supersedes": "IS 15298 (Part 2):2011",
+    "superseded_by": null,
+    "amendments": [],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+15298",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal."
+  },
+  {
+    "standard_number": "IS 800:2007",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2007,
+    "edition": "Third Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 1,
+    "supersedes": "IS 800:1984",
+    "superseded_by": null,
+    "amendments": [
+      {
+        "amendment_number": 1,
+        "year": 2014,
+        "description": "Amendment No.1 to IS 800:2007 covering corrections and updates to limit state design clauses.",
+        "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+800",
+        "verification_date": "2026-09-08"
+      }
+    ],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+800",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Third revision introducing limit state design methodology."
+  },
+  {
+    "standard_number": "IS 10262:2019",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2019,
+    "edition": "Second Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 0,
+    "supersedes": "IS 10262:2009",
+    "superseded_by": null,
+    "amendments": [],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+10262",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Second revision covering self-compacting and high-strength concrete."
+  },
+  {
+    "standard_number": "IS 1077:2020",
+    "lifecycle_status": "ACTIVE",
+    "year_of_publication": 2020,
+    "edition": "Sixth Revision",
+    "reaffirmed_year": null,
+    "reviewed_year": null,
+    "amendment_count": 0,
+    "supersedes": "IS 1077:1992",
+    "superseded_by": null,
+    "amendments": [],
+    "source_url": "https://standardsbis.bsbedge.com/BIS_SearchStandard.aspx?Standard_Number=IS+1077",
+    "verification_date": "2026-09-08",
+    "verification_note": "Status confirmed ACTIVE from BIS portal. Sixth revision of the brick standard."
+  }
+]

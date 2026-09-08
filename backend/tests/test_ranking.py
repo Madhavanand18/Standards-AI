@@ -146,6 +146,8 @@ def test_generate_factual_explanation():
     assert "Fe 500" in explanation or "concrete" in explanation or "reinforcement" in explanation
     # Must ground in official BIS scope
     assert "scope" in explanation.lower()
+    # Must use neutral, non-regulatory language
+    assert "procurement requirements" not in explanation.lower()
     # Must not contain unsupported mandatory/regulatory claims
     assert "mandatory" not in explanation.lower()
     assert "qco" not in explanation.lower()

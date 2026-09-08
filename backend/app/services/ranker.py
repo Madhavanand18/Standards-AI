@@ -158,7 +158,7 @@ def generate_explanation(query: str, standard: dict[str, Any]) -> str:
     # 3. Assemble factual 1-2 sentence explanation
     if matched_kws:
         kws_str = ", ".join(matched_kws[:3])
-        explanation = f"Matches procurement requirements for {kws_str}. Official BIS scope: {best_sentence}"
+        explanation = f"Matches the requirement for {kws_str}. Official BIS scope: {best_sentence}"
     elif best_overlap > 0:
         category = standard.get("category") or "BIS Specification"
         explanation = f"Applies to {category} specifications matching query parameters. Official BIS scope: {best_sentence}"

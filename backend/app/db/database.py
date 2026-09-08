@@ -35,11 +35,41 @@ CREATE TABLE IF NOT EXISTS standard_relationships (
     UNIQUE(source_standard_id, target_standard_id, relationship_type)
 );
 
+CREATE TABLE IF NOT EXISTS standard_lifecycle (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    standard_id INTEGER NOT NULL UNIQUE REFERENCES standards(id) ON DELETE CASCADE,
+    lifecycle_status TEXT NOT NULL DEFAULT 'UNKNOWN',
+    reaffirmed_year INTEGER,
+    reviewed_year INTEGER,
+    amendment_count INTEGER DEFAULT 0,
+    supersedes TEXT,
+    superseded_by TEXT,
+    source_url TEXT,
+    verification_date TEXT,
+    verification_note TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS standard_amendments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    standard_id INTEGER NOT NULL REFERENCES standards(id) ON DELETE CASCADE,
+    amendment_number INTEGER NOT NULL,
+    year INTEGER,
+    description TEXT,
+    source_url TEXT,
+    verification_date TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(standard_id, amendment_number)
+);
+
 CREATE INDEX IF NOT EXISTS idx_standards_number ON standards(standard_number);
 CREATE INDEX IF NOT EXISTS idx_standards_category ON standards(category);
 CREATE INDEX IF NOT EXISTS idx_standards_status ON standards(status);
 CREATE INDEX IF NOT EXISTS idx_rel_source ON standard_relationships(source_standard_id);
 CREATE INDEX IF NOT EXISTS idx_rel_target ON standard_relationships(target_standard_id);
+CREATE INDEX IF NOT EXISTS idx_lifecycle_standard ON standard_lifecycle(standard_id);
+CREATE INDEX IF NOT EXISTS idx_amendments_standard ON standard_amendments(standard_id);
 """
 
 def get_connection(db_path: Path | str | None = None) -> sqlite3.Connection:
@@ -198,3 +228,69 @@ def get_standard_relationships_by_id(
             results.append(item)
         return results
 
+
+def get_lifecycle_by_standard_id(
+    standard_id: int,
+    db_path: Path | str | None = None
+) -> dict[str, Any] | None:
+    """
+    Retrieves lifecycle metadata for a given standard id.
+    Returns None if no lifecycle record exists.
+    """
+    with get_db_cursor(db_path) as cursor:
+        cursor.execute(
+            "SELECT * FROM standard_lifecycle WHERE standard_id = ?",
+            (standard_id,)
+        )
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return dict(row)
+
+
+def get_amendments_by_standard_id(
+    standard_id: int,
+    db_path: Path | str | None = None
+) -> list[dict[str, Any]]:
+    """
+    Retrieves all amendments for a given standard_id, ordered by amendment number.
+    """
+    with get_db_cursor(db_path) as cursor:
+        cursor.execute(
+            "SELECT * FROM standard_amendments WHERE standard_id = ? ORDER BY amendment_number ASC",
+            (standard_id,)
+        )
+        rows = cursor.fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_lifecycle_by_number(
+    standard_number: str,
+    db_path: Path | str | None = None
+) -> dict[str, Any] | None:
+    """
+    Retrieves full lifecycle metadata (including amendments) for a standard number.
+    Returns None if the standard does not exist.
+    """
+    std = get_standard_by_number(standard_number, db_path=db_path)
+    if not std:
+        return None
+    lc = get_lifecycle_by_standard_id(std["id"], db_path=db_path)
+    amendments = get_amendments_by_standard_id(std["id"], db_path=db_path)
+    return {
+        "standard_id": std["id"],
+        "standard_number": std["standard_number"],
+        "title": std["title"],
+        "year_of_publication": std.get("year_of_publication"),
+        "edition": std.get("edition"),
+        "lifecycle_status": lc["lifecycle_status"] if lc else "UNKNOWN",
+        "reaffirmed_year": lc["reaffirmed_year"] if lc else None,
+        "reviewed_year": lc["reviewed_year"] if lc else None,
+        "amendment_count": lc["amendment_count"] if lc else 0,
+        "supersedes": lc["supersedes"] if lc else None,
+        "superseded_by": lc["superseded_by"] if lc else std.get("superseded_by"),
+        "source_url": lc["source_url"] if lc else std.get("source_url"),
+        "verification_date": lc["verification_date"] if lc else None,
+        "verification_note": lc["verification_note"] if lc else None,
+        "amendments": amendments,
+    }
