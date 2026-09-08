@@ -4,7 +4,7 @@ export default function ResultCard({ standard, rank }) {
   const [expanded, setExpanded] = useState(false);
 
   const scorePct = Math.round(standard.similarity_score * 100);
-  const isHighMatch = scorePct >= 50;
+  const relevanceLabel = standard.relevance_label || (scorePct >= 60 ? 'High' : scorePct >= 40 ? 'Medium' : 'Low');
 
   return (
     <div className="result-card" id={`standard-${standard.standard_number.replace(/[^a-zA-Z0-9]/g, '-')}`}>
@@ -22,15 +22,34 @@ export default function ResultCard({ standard, rank }) {
           )}
         </div>
 
-        <div className={`score-badge ${isHighMatch ? 'score-high' : ''}`} title="Cosine similarity against official BIS scope text">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-          <span>{scorePct}% Semantic Relevance</span>
+        <div className="score-badge-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span className={`relevance-badge relevance-${relevanceLabel.toLowerCase()}`}>
+            {relevanceLabel} Relevance
+          </span>
+          <div className="score-badge" title="Combined 75% semantic vector + 25% BIS metadata relevance score">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+            <span>{scorePct}% Match</span>
+          </div>
         </div>
       </div>
 
       <h2 className="result-title">{standard.title}</h2>
+
+      {standard.explanation && (
+        <div className="why-standard-box">
+          <div className="why-standard-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <strong>Why this standard?</strong>
+          </div>
+          <p className="why-standard-text">{standard.explanation}</p>
+        </div>
+      )}
 
       <div className="result-scope">
         <strong style={{ color: '#94a3b8', fontSize: '0.8rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.35rem' }}>

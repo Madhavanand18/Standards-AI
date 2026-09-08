@@ -130,10 +130,10 @@ def test_search_deduplication_regression():
 
     # Check that highest score was preserved for IS 1786 (0.88, not 0.65) and IS 2062 (0.75, not 0.50)
     assert data["results"][0]["standard_number"] == "IS 1786:2008"
-    assert data["results"][0]["similarity_score"] == 0.88
+    assert data["results"][0]["dense_score"] == 0.88
 
     assert data["results"][1]["standard_number"] == "IS 2062:2011"
-    assert data["results"][1]["similarity_score"] == 0.75
+    assert data["results"][1]["dense_score"] == 0.75
 
 def test_search_tmt_rebar():
     response = client.post(
@@ -154,6 +154,61 @@ def test_search_tmt_rebar():
     assert "Deformed Steel Bars" in top["title"]
     assert top["similarity_score"] > 0.4
     assert top["source_url"] is not None
+
+def test_search_fe500_reinforcement_ranking_api():
+    """
+    Test Fe 500 reinforcement query ranking via API.
+    IS 1786 must rank above IS 2062.
+    Also verify explanation and relevance label are present and valid.
+    """
+    response = client.post(
+        "/api/v1/search",
+        json={"query": "Fe 500 ribbed steel bars for reinforced concrete columns", "limit": 5}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    results = data["results"]
+    assert len(results) >= 2
+
+    # Verify IS 1786 is #1 and ranks above IS 2062
+    top = results[0]
+    assert "IS 1786" in top["standard_number"]
+    assert any("IS 2062" in r["standard_number"] for r in results)
+    
+    # Verify explanation and relevance_label on results
+    for r in results:
+        assert r["relevance_label"] in {"High", "Medium", "Low"}
+        assert r["explanation"] is not None
+        assert len(r["explanation"]) > 0
+        assert "scope" in r["explanation"].lower() or "matches" in r["explanation"].lower()
+    
+    # Find positions
+    is_1786_idx = next(i for i, r in enumerate(results) if "IS 1786" in r["standard_number"])
+    is_2062_idx = next(i for i, r in enumerate(results) if "IS 2062" in r["standard_number"])
+    assert is_1786_idx < is_2062_idx
+
+def test_search_dynamic_threshold_api():
+    """
+    Test configurable score_threshold in search API.
+    Higher threshold returns fewer, more strictly relevant results.
+    """
+    # 1. Search with low threshold (0.2) -> returns multiple items
+    resp_low = client.post(
+        "/api/v1/search",
+        json={"query": "12 mm TMT reinforcement bars for RCC construction", "limit": 10, "score_threshold": 0.2}
+    )
+    assert resp_low.status_code == 200
+    count_low = resp_low.json()["total_matches"]
+
+    # 2. Search with high threshold (0.80) -> returns only very high matches
+    resp_high = client.post(
+        "/api/v1/search",
+        json={"query": "12 mm TMT reinforcement bars for RCC construction", "limit": 10, "score_threshold": 0.80}
+    )
+    assert resp_high.status_code == 200
+    count_high = resp_high.json()["total_matches"]
+
+    assert count_high <= count_low
 
 def test_search_structural_steel():
     response = client.post(

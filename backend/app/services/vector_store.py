@@ -22,10 +22,24 @@ class QdrantVectorStore:
         if self.url:
             logger.info(f"Connecting to remote Qdrant server at: {self.url}")
             self.client = QdrantClient(url=self.url)
+        elif str(self.storage_path) == ":memory:":
+            logger.info("Using in-memory Qdrant storage")
+            self.client = QdrantClient(location=":memory:")
         else:
             self.storage_path.mkdir(parents=True, exist_ok=True)
             logger.info(f"Using local embedded Qdrant storage at: {self.storage_path}")
-            self.client = QdrantClient(path=str(self.storage_path))
+            # Retry a few times in case previous reload worker is releasing file lock
+            import time
+            for attempt in range(4):
+                try:
+                    self.client = QdrantClient(path=str(self.storage_path))
+                    break
+                except RuntimeError as e:
+                    if "already accessed" in str(e) and attempt < 3:
+                        logger.warning(f"Qdrant lock busy, retrying in 0.5s (attempt {attempt + 1}/3)...")
+                        time.sleep(0.5)
+                    else:
+                        raise
 
     def ensure_collection(self, dimension: int = 384) -> None:
         """Ensures the collection exists with correct vector size and Cosine distance."""

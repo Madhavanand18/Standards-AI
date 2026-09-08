@@ -10,12 +10,22 @@ class SearchRequest(BaseModel):
         le=settings.MAX_SEARCH_LIMIT,
         description="Maximum number of standards to return"
     )
+    score_threshold: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Minimum relevance score threshold for returning results (defaults to system setting if not specified)"
+    )
 
 class StandardResult(BaseModel):
     db_id: int | None = None
     standard_number: str
     title: str
     similarity_score: float
+    relevance_label: str = "Medium"
+    explanation: str | None = None
+    dense_score: float | None = None
+    metadata_score: float | None = None
     category: str | None = None
     department: str | None = None
     scope: str

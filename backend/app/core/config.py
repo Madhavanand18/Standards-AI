@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     # Search Settings
     DEFAULT_SEARCH_LIMIT: int = 10
     MAX_SEARCH_LIMIT: int = 50
+    DEFAULT_SCORE_THRESHOLD: float = 0.38
 
     # Qdrant Vector DB Settings
     # If QDRANT_URL is not set, QdrantClient uses local embedded disk storage

@@ -4,17 +4,20 @@
 - **Run 0 (Project Foundation and Environment):** COMPLETED
 - **Run 1 (Core Semantic Standards Search MVP):** COMPLETED
 - **Pre-Run-2 Data Quality & Evidence Cleanup:** COMPLETED
-- **Run 2 (Improved Ranking, Metadata Filtering, Confidence and Explanations):** NOT STARTED
+- **Run 2A (Dynamic Results & Metadata-Enhanced Ranking):** COMPLETED
+- **Run 2B (Explainability & Relevance Tiers):** COMPLETED
 - **Run 3 to Run 8:** NOT STARTED
 
 ---
 
-## Functional Status (Run 1 + Pre-Run-2 Cleanup Completed)
-- A working, fully verified vertical slice from authentic BIS seed metadata to browser-based interactive semantic retrieval is operational.
-- Users can enter procurement specifications or tender clauses in the React UI and receive real, verified Indian Standards ranked by dense cosine similarity.
+## Functional Status (Run 2A + Run 2B Completed)
+- Dynamic search results implemented: returns only results above configurable relevance threshold (`settings.DEFAULT_SCORE_THRESHOLD = 0.38` or user query threshold).
+- Hybrid ranking implemented preserving dense semantic search as primary signal (75% weight) boosted by authentic BIS metadata (title, scope, category, keywords, standard number - 25% weight).
+- Verified that IS 1786:2008 ranks decisively above IS 2062:2011 for `"Fe 500 ribbed steel bars for reinforced concrete columns"`.
+- Explainability engine implemented: generates concise 1-2 sentence "Why this standard?" justifications strictly citing official BIS scope, title, category, and matching keywords without hallucinating regulatory claims.
+- Relevance labels (High, Medium, Low) calibrated and rendered in UI and API responses.
 - 100% local operation: zero paid API dependencies, zero external cloud requirements.
-- 9/9 automated backend tests passing (`pytest backend/tests/ -v`, 2.41s).
-- Live end-to-end browser testing verified via automated browser subagent.
+- 18/18 automated backend tests passing (`pytest backend/tests/ -v`, 3.56s).
 
 ### Pre-Run-2 Cleanup Summary
 - All unsupported regulatory/QCO/procurement claims removed from `source_evidence_note` fields in the seed dataset.
