@@ -67,16 +67,23 @@ def search_standards(
             limit=request.limit
         )
 
-        # 3. Format results with canonical SQLite BIS metadata
+        # 3. Format results with canonical SQLite BIS metadata (deduplicating by standard_number)
         results: list[StandardResult] = []
+        seen_standards: set[str] = set()
         for m in matches:
             payload = m.get("payload", {})
+            std_number = payload.get("standard_number", "UNKNOWN")
+
+            # Deduplicate by standard_number, keeping only the highest-scoring result
+            if std_number in seen_standards:
+                continue
+            seen_standards.add(std_number)
+
             score = round(m.get("score", 0.0), 4)
 
             # Ensure confidence is clamped between 0 and 1
             clamped_score = max(0.0, min(1.0, score))
 
-            std_number = payload.get("standard_number", "UNKNOWN")
             db_record = get_standard_by_number(std_number) or {}
             full_scope = db_record.get("scope") or payload.get("scope", "")
 
