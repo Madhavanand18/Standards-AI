@@ -11,12 +11,15 @@ logger = logging.getLogger(__name__)
 
 def seed_database(
     seed_file_path: Path | str | None = None,
+    seed_rel_path: Path | str | None = None,
     db_path: Path | str | None = None,
     reset: bool = False
 ) -> int:
     seed_path = Path(seed_file_path or settings.SEED_DATA_PATH)
     if not seed_path.exists():
         raise FileNotFoundError(f"Seed file not found at: {seed_path}")
+
+    rel_path = Path(seed_rel_path or settings.SEED_RELATIONSHIPS_PATH)
 
     init_db(db_path)
 
@@ -76,33 +79,53 @@ def seed_database(
             )
             count += 1
 
-        # Seed key authoritative relationships
-        # IS 456 (Concrete) -> IS 1786 (Rebar) and IS 269 (Cement)
-        # IS 800 (Steel Design) -> IS 2062 (Structural Steel)
+        # Build mapping of standard_number to ID
         cursor.execute("SELECT id, standard_number FROM standards")
         mapping = {row["standard_number"]: row["id"] for row in cursor.fetchall()}
 
-        relationships = [
-            ("IS 456:2000", "IS 1786:2008", "NORMATIVE_REFERENCE", "Reinforcement steel specification cited in concrete design clause"),
-            ("IS 456:2000", "IS 269:2015", "NORMATIVE_REFERENCE", "Cement specification cited in concrete ingredients specification"),
-            ("IS 456:2000", "IS 10262:2019", "PRODUCT_COMPANION", "Concrete mix proportioning companion standard"),
-            ("IS 800:2007", "IS 2062:2011", "NORMATIVE_REFERENCE", "Structural steel materials reference in limit state steel design"),
-            ("IS 1239 (Part 1):2004", "IS 3589:2001", "PRODUCT_COMPANION", "Mild steel piping family companion (small bore vs large bore)"),
-        ]
+        # Load relationships from curated JSON file if available
+        relationships_to_seed = []
+        if rel_path.exists():
+            with open(rel_path, "r", encoding="utf-8") as rf:
+                rel_data: list[dict[str, Any]] = json.load(rf)
+                for r in rel_data:
+                    relationships_to_seed.append((
+                        r["source_standard_number"],
+                        r["target_standard_number"],
+                        r["relationship_type"].lower(),
+                        r.get("evidence_text") or r.get("description", "")
+                    ))
+        else:
+            # Authoritative default fallback relationships
+            relationships_to_seed = [
+                ("IS 456:2000", "IS 1786:2008", "normative_reference", "Clause 5.6.1 of IS 456 specifies high strength deformed steel bars conforming to IS 1786 for reinforced concrete construction."),
+                ("IS 456:2000", "IS 269:2015", "normative_reference", "Clause 5.1(a) of IS 456 specifies 33, 43, and 53 grade Ordinary Portland Cement conforming to IS 269 as standard cementitious binder."),
+                ("IS 456:2000", "IS 10262:2019", "design_code", "Clause 9.1.1 of IS 456 references IS 10262 for standard guidelines and calculations on concrete mix proportioning."),
+                ("IS 800:2007", "IS 2062:2011", "normative_reference", "Section 2 and Table 1 of IS 800 specify hot-rolled medium and high tensile structural steel conforming to IS 2062 for structural steelwork design."),
+                ("IS 800:2007", "IS 1239 (Part 1):2004", "normative_reference", "Section 2 of IS 800 lists steel tubes conforming to IS 1239 (Part 1) as approved tubular structural hollow sections."),
+            ]
 
-        for src, tgt, rel_type, desc in relationships:
+        # Cleanly synchronize relationship table to prevent case duplicate entries
+        cursor.execute("DELETE FROM standard_relationships;")
+
+        rel_count = 0
+        for src, tgt, rel_type, desc in relationships_to_seed:
             if src in mapping and tgt in mapping:
                 cursor.execute(
                     """
-                    INSERT OR IGNORE INTO standard_relationships (
+                    INSERT INTO standard_relationships (
                         source_standard_id, target_standard_id, relationship_type, description
                     ) VALUES (?, ?, ?, ?)
+                    ON CONFLICT(source_standard_id, target_standard_id, relationship_type) DO UPDATE SET
+                        description = excluded.description
                     """,
-                    (mapping[src], mapping[tgt], rel_type, desc)
+                    (mapping[src], mapping[tgt], rel_type.lower(), desc)
                 )
+                rel_count += 1
 
-    logger.info(f"Database successfully populated with {count} verified Indian Standards.")
+    logger.info(f"Database successfully populated with {count} standards and {rel_count} relationships.")
     return count
+
 
 if __name__ == "__main__":
     import argparse
@@ -110,3 +133,4 @@ if __name__ == "__main__":
     parser.add_argument("--reset", action="store_true", help="Clear existing data before seeding")
     args = parser.parse_args()
     seed_database(reset=args.reset)
+

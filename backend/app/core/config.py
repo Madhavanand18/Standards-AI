@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     # SQLite Database
     SQLITE_DB_PATH: Path = WORKSPACE_DIR / "data" / "db" / "standards.db"
     SEED_DATA_PATH: Path = WORKSPACE_DIR / "data" / "raw" / "bis_seed_standards.json"
+    SEED_RELATIONSHIPS_PATH: Path = WORKSPACE_DIR / "data" / "raw" / "bis_seed_relationships.json"
 
     # Search Settings
     DEFAULT_SEARCH_LIMIT: int = 10

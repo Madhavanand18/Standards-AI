@@ -6,18 +6,21 @@
 - **Pre-Run-2 Data Quality & Evidence Cleanup:** COMPLETED
 - **Run 2A (Dynamic Results & Metadata-Enhanced Ranking):** COMPLETED
 - **Run 2B (Explainability & Relevance Tiers):** COMPLETED
-- **Run 3 to Run 8:** NOT STARTED
+- **Run 3A (Related Standards Foundation):** COMPLETED
+- **Run 3B to Run 8:** NOT STARTED
+
 
 ---
 
-## Functional Status (Run 2A + Run 2B Completed)
-- Dynamic search results implemented: returns only results above configurable relevance threshold (`settings.DEFAULT_SCORE_THRESHOLD = 0.38` or user query threshold).
-- Hybrid ranking implemented preserving dense semantic search as primary signal (75% weight) boosted by authentic BIS metadata (title, scope, category, keywords, standard number - 25% weight).
-- Verified that IS 1786:2008 ranks decisively above IS 2062:2011 for `"Fe 500 ribbed steel bars for reinforced concrete columns"`.
-- Explainability engine implemented: generates concise 1-2 sentence "Why this standard?" justifications strictly citing official BIS scope, title, category, and matching keywords without hallucinating regulatory claims.
-- Relevance labels (High, Medium, Low) calibrated and rendered in UI and API responses.
+## Functional Status (Run 3A Completed)
+- Authoritative standard relationships stored in SQLite `standard_relationships` table with clause/standard scope evidence text.
+- 19 verified relationships across 6 relationship types (`normative_reference`, `design_code`, `related_product`, `safety`, `test_method`, `terminology`) covering the 15 BIS seed standards.
+- Deterministic relationship retrieval service (`RelationshipService`) with zero vector similarity inference and zero fabricated claims.
+- RESTful relationship endpoints exposed: `GET /api/v1/standards/{standard_number}/relationships` and `GET /api/v1/relationships?standard_number=...` with optional `relationship_type` filtering and type-based grouping.
+- Dynamic search results & hybrid ranking preserved from Run 2A/2B.
 - 100% local operation: zero paid API dependencies, zero external cloud requirements.
-- 18/18 automated backend tests passing (`pytest backend/tests/ -v`, 3.56s).
+- 27/27 automated backend tests passing (`pytest backend/tests/ -v`).
+
 
 ### Pre-Run-2 Cleanup Summary
 - All unsupported regulatory/QCO/procurement claims removed from `source_evidence_note` fields in the seed dataset.
