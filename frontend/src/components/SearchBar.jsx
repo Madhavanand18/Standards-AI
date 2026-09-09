@@ -10,7 +10,16 @@ const QUICK_QUERIES = [
   "Industrial safety helmets for construction workers"
 ];
 
-export default function SearchBar({ query, setQuery, onSearch, loading, limit, setLimit }) {
+export default function SearchBar({
+  query,
+  setQuery,
+  onSearch,
+  loading,
+  limit,
+  setLimit,
+  isFromDoc,
+  onClearQuery,
+}) {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -20,47 +29,76 @@ export default function SearchBar({ query, setQuery, onSearch, loading, limit, s
     }
   };
 
+  const wordCount = query.trim() ? query.trim().split(/\s+/).length : 0;
+  const isLargeText = query.length > 400;
+
   return (
-    <div className="search-card">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <label htmlFor="procurement-query" className="search-label">
-          Technical Specification / Requirement Description
-        </label>
-        <span style={{ fontSize: '0.78rem', color: '#38bdf8', fontWeight: '500' }}>
-          🌐 Search in English, Hindi, or mixed language (Hinglish)
-        </span>
+    <div className="search-container" role="search" aria-label="Indian Standards Specification Search">
+      <div className="search-header-group">
+        <div className="search-header-top">
+          <h2 className="search-main-heading">Find Applicable Indian Standards</h2>
+          {isFromDoc && (
+            <span className="source-doc-pill" title="Specification loaded from PDF Tender Document">
+              📄 Loaded from Tender Document
+            </span>
+          )}
+        </div>
+        <p className="search-subtext">
+          Enter technical specifications, item descriptions, material grades, or procurement clauses in English, Hindi, or Hinglish.
+        </p>
       </div>
-      <div className="search-input-wrapper">
-        <textarea
-          id="procurement-query"
-          className="search-textarea"
-          rows={3}
-          placeholder="Enter procurement item description in English, Hindi, or Hinglish (e.g. '12 mm Fe 500 TMT sariya RCC construction ke liye')..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          disabled={loading}
-        />
-        <div className="search-actions">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span className="char-count">{query.length} characters</span>
+
+      <div className="search-input-area">
+        <div className="textarea-wrapper">
+          <textarea
+            id="procurement-query"
+            className={`search-textarea ${isLargeText ? 'large-content' : ''}`}
+            rows={3}
+            placeholder="Enter procurement requirement (e.g., '12 mm Fe 500 TMT sariya RCC construction ke liye' or 'Hot rolled steel plates')..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={loading}
+            aria-label="Procurement Specification Query"
+          />
+
+          {query && !loading && (
+            <button
+              type="button"
+              className="clear-query-btn"
+              onClick={onClearQuery ? onClearQuery : () => setQuery('')}
+              title="Clear search text"
+              aria-label="Clear search input"
+            >
+              &times;
+            </button>
+          )}
+        </div>
+
+        <div className="search-controls-row">
+          <div className="search-controls-left">
+            <span className="multilingual-tag" title="Supports English, Hindi, and Hinglish semantic matching">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              <span>English, Hindi & Hinglish supported</span>
+            </span>
+
+            <span className="search-char-count">
+              {query.length} chars{wordCount > 0 ? ` · ${wordCount} words` : ''}
+            </span>
+
             {setLimit && (
-              <label style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <label className="limit-select-label">
                 <span>Limit:</span>
                 <select
                   value={limit || 10}
                   onChange={(e) => setLimit(Number(e.target.value))}
                   disabled={loading}
-                  style={{
-                    background: '#0f172a',
-                    color: '#e2e8f0',
-                    border: '1px solid #334155',
-                    borderRadius: '4px',
-                    padding: '0.2rem 0.4rem',
-                    fontSize: '0.8rem',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
+                  className="limit-select"
+                  aria-label="Number of results to return"
                 >
                   <option value={5}>Top 5</option>
                   <option value={10}>Top 10</option>
@@ -69,46 +107,52 @@ export default function SearchBar({ query, setQuery, onSearch, loading, limit, s
               </label>
             )}
           </div>
-          <button
-            id="search-btn"
-            className="search-btn"
-            onClick={() => onSearch(query)}
-            disabled={loading || !query.trim()}
-          >
-            {loading ? (
-              <>
-                <div
-                  style={{
-                    width: '16px',
-                    height: '16px',
-                    border: '2px solid rgba(255,255,255,0.3)',
-                    borderTopColor: '#fff',
-                    borderRadius: '50%',
-                    animation: 'spin 0.6s linear infinite'
-                  }}
-                />
-                <span>Searching Standards...</span>
-              </>
-            ) : (
-              <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <span>Find Applicable Standards</span>
-              </>
+
+          <div className="search-controls-right">
+            {query && (
+              <button
+                type="button"
+                className="clear-text-link"
+                onClick={onClearQuery ? onClearQuery : () => setQuery('')}
+                disabled={loading}
+              >
+                Clear
+              </button>
             )}
-          </button>
+
+            <button
+              id="search-btn"
+              type="button"
+              className="search-submit-btn"
+              onClick={() => onSearch(query)}
+              disabled={loading || !query.trim()}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner spinner-white" aria-hidden="true"></span>
+                  <span>Searching Standards...</span>
+                </>
+              ) : (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <span>Find Applicable Standards</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="quick-queries">
-        <div className="quick-queries-label">Sample Tender Specifications (Click to test):</div>
-        <div className="chips-container">
+      <div className="sample-queries-section">
+        <div className="sample-queries-title">Sample Procurement Specifications (Click to Test):</div>
+        <div className="sample-chips-row">
           {QUICK_QUERIES.map((item, idx) => (
             <button
               key={idx}
-              className="chip"
+              className="sample-chip"
               type="button"
               onClick={() => {
                 setQuery(item);

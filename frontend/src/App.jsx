@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import HeroSection from './components/HeroSection';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
 import DocumentUpload from './components/DocumentUpload';
+import FuturePage from './components/FuturePage';
+import SettingsModal from './components/SettingsModal';
+import AboutModal from './components/AboutModal';
 
 const API_BASE = 'http://localhost:8000/api/v1';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('search');
+  const [activeTab, setActiveTab] = useState('home');
   const [query, setQuery] = useState('');
   const [limit, setLimit] = useState(10);
   const [searchedQuery, setSearchedQuery] = useState('');
@@ -17,6 +21,11 @@ export default function App() {
   const [error, setError] = useState(null);
   const [auditDisclaimer, setAuditDisclaimer] = useState('');
   const [systemHealth, setSystemHealth] = useState(null);
+
+  // UX & Flow state
+  const [isFromDoc, setIsFromDoc] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [aboutModalOpen, setAboutModalOpen] = useState(false);
 
   // Fetch system health on mount
   useEffect(() => {
@@ -32,7 +41,7 @@ export default function App() {
   }, []);
 
   const handleSearch = async (searchQuery, customLimit) => {
-    const q = (searchQuery || query).trim();
+    const q = (searchQuery !== undefined ? searchQuery : query).trim();
     if (!q) return;
 
     setLoading(true);
@@ -70,75 +79,85 @@ export default function App() {
     }
   };
 
+  // PDF Analyzer -> Home Page Workflow Handler
+  const handleAnalyzeFromDoc = (extractedText) => {
+    const text = (extractedText || '').trim();
+    if (!text) return;
+
+    setQuery(text);
+    setIsFromDoc(true);
+    setActiveTab('home');
+
+    // Smoothly scroll to search area
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Automatically execute the search
+    handleSearch(text, limit);
+  };
+
+  const handleClearQuery = () => {
+    setQuery('');
+    setIsFromDoc(false);
+  };
+
   return (
-    <div className="app-container">
-      <Header systemHealth={systemHealth} />
+    <div className="app-shell">
+      {/* Global Navigation */}
+      <Header
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        systemHealth={systemHealth}
+        onOpenSettings={() => setSettingsModalOpen(true)}
+        onOpenAbout={() => setAboutModalOpen(true)}
+      />
 
-      <div className="tab-navigation-bar">
-        <button
-          type="button"
-          className={`tab-nav-btn ${activeTab === 'search' ? 'active' : ''}`}
-          onClick={() => setActiveTab('search')}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <span>Specification Search</span>
-        </button>
+      <main className="main-content" role="main">
+        {/* ── 1. HOME TAB: SPECIFICATION SEARCH & RESULTS ── */}
+        {activeTab === 'home' && (
+          <>
+            <HeroSection />
 
-        <button
-          type="button"
-          className={`tab-nav-btn ${activeTab === 'upload' ? 'active' : ''}`}
-          onClick={() => setActiveTab('upload')}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="12" y1="18" x2="12" y2="12"></line>
-            <polyline points="9 15 12 12 15 15"></polyline>
-          </svg>
-          <span>Tender Document (PDF)</span>
-          <span className="tab-badge">Run 6A</span>
-        </button>
-      </div>
+            <SearchBar
+              query={query}
+              setQuery={(val) => {
+                setQuery(val);
+                if (!val) setIsFromDoc(false);
+              }}
+              onSearch={handleSearch}
+              loading={loading}
+              limit={limit}
+              setLimit={setLimit}
+              isFromDoc={isFromDoc}
+              onClearQuery={handleClearQuery}
+            />
 
-      {activeTab === 'search' && (
-        <>
-          <SearchBar
-            query={query}
-            setQuery={setQuery}
-            onSearch={handleSearch}
-            loading={loading}
-            limit={limit}
-            setLimit={setLimit}
-          />
-
-          {error && (
-            <div className="error-banner" role="alert">
-              <strong>Search Error:</strong> {error}
-            </div>
-          )}
-
-          {loading && (
-            <div className="loading-box">
-              <div className="spinner"></div>
-              <p>Running local dense multilingual semantic search over BIS database...</p>
-            </div>
-          )}
-
-          {!loading && searchedQuery && results.length > 0 && (
-            <section className="results-section">
-              <div className="results-header">
-                <h2 className="results-count">
-                  Found {totalMatches || results.length} Potentially Applicable Standard{(totalMatches || results.length) > 1 ? 's' : ''}
-                </h2>
-                <span className="anti-hallucination-badge">
-                  ✓ Based on Verified BIS Scope
-                </span>
+            {error && (
+              <div className="error-banner" role="alert">
+                <strong>Search Error: </strong> {error}
               </div>
+            )}
 
-              <div className="results-list">
+            {loading && (
+              <div className="state-box" aria-live="polite">
+                <div className="spinner"></div>
+                <div className="state-title">Searching Indian Standards Database</div>
+                <div className="state-desc">
+                  Performing dense multilingual semantic search and metadata scoring over official BIS standards.
+                </div>
+              </div>
+            )}
+
+            {!loading && searchedQuery && results.length > 0 && (
+              <section className="results-container" aria-label="Search Results">
+                <div className="results-top-bar">
+                  <h2 className="results-count-title">
+                    Found {totalMatches || results.length} Potentially Applicable Standard{(totalMatches || results.length) !== 1 ? 's' : ''}
+                  </h2>
+                  <span className="results-verified-badge">
+                    ✓ Grounded in Authoritative BIS Scope
+                  </span>
+                </div>
+
                 {results.map((standard, index) => (
                   <ResultCard
                     key={standard.standard_number || index}
@@ -146,36 +165,60 @@ export default function App() {
                     rank={index + 1}
                   />
                 ))}
-              </div>
 
-              {auditDisclaimer && (
-                <div className="audit-disclaimer-box">
-                  <div className="audit-disclaimer-title">Procurement Audit & Compliance Notice</div>
-                  <p>{auditDisclaimer}</p>
+                {auditDisclaimer && (
+                  <div className="audit-disclaimer-card" role="note">
+                    <div className="audit-title">Procurement Compliance & Verification Notice</div>
+                    <p className="audit-text">{auditDisclaimer}</p>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {!loading && searchedQuery && results.length === 0 && !error && (
+              <div className="state-box" role="status">
+                <div className="state-icon">🔍</div>
+                <div className="state-title">No Indian Standards Matched This Specification</div>
+                <div className="state-desc">
+                  Try refining the technical keywords, specifying material grades (e.g., Fe 500, IS 1786), or entering alternative procurement descriptions.
                 </div>
-              )}
-            </section>
-          )}
+              </div>
+            )}
 
-          {!loading && searchedQuery && results.length === 0 && !error && (
-            <div className="empty-state">
-              <div className="empty-icon">🔍</div>
-              <h3>No Indian Standards matched this specification</h3>
-              <p>Try refining the technical keywords or specifying the material/grade directly.</p>
-            </div>
-          )}
+            {!searchedQuery && !loading && (
+              <div className="state-box" role="status">
+                <div className="state-icon">📋</div>
+                <div className="state-title">Ready for Procurement Requirement</div>
+                <div className="state-desc">
+                  Enter a technical specification above, click one of the sample procurement queries, or extract text from a tender PDF to retrieve applicable Indian Standards with verified lifecycle and compliance data.
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
-          {!searchedQuery && !loading && (
-            <div className="empty-state">
-              <div className="empty-icon">📋</div>
-              <h3>Ready for Technical Specification Input</h3>
-              <p>Enter a procurement item description above or click one of the sample tender queries to retrieve applicable Indian Standards.</p>
-            </div>
-          )}
-        </>
-      )}
+        {/* ── 2. TENDER DOCUMENT ANALYZER TAB ── */}
+        {activeTab === 'pdf-analyzer' && (
+          <DocumentUpload onAnalyzeText={handleAnalyzeFromDoc} />
+        )}
 
-      {activeTab === 'upload' && <DocumentUpload />}
+        {/* ── 3. FUTURE CAPABILITIES & ROADMAP TAB ── */}
+        {activeTab === 'future' && <FuturePage />}
+      </main>
+
+      {/* ── MODALS ── */}
+      <SettingsModal
+        isOpen={settingsModalOpen}
+        onClose={() => setSettingsModalOpen(false)}
+        limit={limit}
+        setLimit={setLimit}
+        systemHealth={systemHealth}
+      />
+
+      <AboutModal
+        isOpen={aboutModalOpen}
+        onClose={() => setAboutModalOpen(false)}
+      />
     </div>
   );
 }

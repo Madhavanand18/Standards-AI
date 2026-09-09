@@ -2,33 +2,62 @@ import React, { useState } from 'react';
 
 const API_BASE = 'http://localhost:8000/api/v1';
 
-export default function DocumentUpload() {
+export default function DocumentUpload({ onAnalyzeText }) {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [result, setResult] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+  const [extractionResult, setExtractionResult] = useState(null);
   const [activePage, setActivePage] = useState(1);
+  const [copied, setCopied] = useState(false);
+  const [analyzeScope, setAnalyzeScope] = useState('all'); // 'all' or 'page'
+
+  const handleFileSelection = (file) => {
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      setUploadError('Only PDF documents (.pdf) are supported.');
+      setSelectedFile(null);
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      setUploadError('Document exceeds 20 MB limit.');
+      setSelectedFile(null);
+      return;
+    }
+    setSelectedFile(file);
+    setUploadError(null);
+    setExtractionResult(null);
+    setActivePage(1);
+    setAnalyzeScope('all');
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (!file.name.toLowerCase().endsWith('.pdf')) {
-        setError('Only PDF files (.pdf) are supported in this phase.');
-        setSelectedFile(null);
-        return;
-      }
-      setSelectedFile(file);
-      setError(null);
-      setResult(null);
-      setActivePage(1);
-    }
+    handleFileSelection(file);
   };
 
-  const handleUpload = async () => {
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    handleFileSelection(file);
+  };
+
+  const handleExtract = async () => {
     if (!selectedFile) return;
 
-    setLoading(true);
-    setError(null);
+    setUploading(true);
+    setUploadError(null);
 
     const formData = new FormData();
     formData.append('file', selectedFile);
@@ -41,184 +70,285 @@ export default function DocumentUpload() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.detail || `Upload failed with status HTTP ${res.status}`);
+        throw new Error(errData.detail || `Upload error (HTTP ${res.status})`);
       }
 
       const data = await res.json();
-      setResult(data);
+      setExtractionResult(data);
       setActivePage(1);
+      setAnalyzeScope('all');
     } catch (err) {
-      console.error('Document upload failed:', err);
-      setError(err.message || 'Failed to upload and extract document.');
-      setResult(null);
+      console.error('PDF extraction failed:', err);
+      setUploadError(err.message || 'Failed to upload and extract tender document.');
+      setExtractionResult(null);
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
-  const activePageData = result?.pages?.find((p) => p.page_number === activePage) || result?.pages?.[0];
+  const activePageData =
+    extractionResult?.pages?.find((p) => p.page_number === activePage) ||
+    extractionResult?.pages?.[0];
+
+  const handleCopyText = () => {
+    const textToCopy =
+      analyzeScope === 'page'
+        ? activePageData?.cleaned_text || extractionResult?.extracted_text || ''
+        : extractionResult?.extracted_text ||
+          extractionResult?.pages?.map((p) => p.cleaned_text).filter(Boolean).join('\n\n') ||
+          '';
+
+    if (!textToCopy) return;
+
+    navigator.clipboard
+      .writeText(textToCopy)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+  };
+
+  const handleTriggerAnalyze = () => {
+    if (!extractionResult || !onAnalyzeText) return;
+
+    // Collect text based on user selection
+    let textToAnalyze = '';
+    if (analyzeScope === 'page' && activePageData?.cleaned_text) {
+      textToAnalyze = activePageData.cleaned_text;
+    } else {
+      textToAnalyze =
+        extractionResult.extracted_text ||
+        extractionResult.pages?.map((p) => p.cleaned_text).filter(Boolean).join('\n\n') ||
+        '';
+    }
+
+    if (!textToAnalyze.trim()) {
+      setUploadError('No extractable text found to analyze.');
+      return;
+    }
+
+    // Call top-level handler to switch to Home, populate search query, and trigger search
+    onAnalyzeText(textToAnalyze.trim());
+  };
+
+  const totalWords = extractionResult?.pages
+    ? extractionResult.pages.reduce((sum, p) => sum + (p.word_count || 0), 0)
+    : 0;
 
   return (
-    <div className="doc-upload-card" id="doc-upload-section">
-      <div className="doc-upload-header">
-        <div className="doc-upload-title-group">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#60a5fa' }}>
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10 9 9 9 8 9"></polyline>
-          </svg>
-          <div>
-            <h2 className="doc-upload-title">Tender & Specification PDF Ingestion</h2>
-            <p className="doc-upload-desc">
-              Upload procurement tender documents or technical specifications (up to 20 MB). Deterministically extracts text preserving page boundaries and technical identifiers.
-            </p>
-          </div>
-        </div>
-        <span className="doc-upload-badge">Run 6A Foundation</span>
+    <div className="pdf-analyzer-page">
+      {/* Page Header */}
+      <div className="page-intro-header">
+        <h1 className="page-intro-title">Tender Document Analyzer</h1>
+        <p className="page-intro-subtitle">
+          Upload technical specifications, tender schedules, or Bills of Quantities (PDF up to 20 MB).
+          Extracts page-by-page specification text and routes it directly to the Standards-AI search engine.
+        </p>
       </div>
 
-      <div className="doc-upload-controls">
-        <div className="file-input-wrapper">
+      {/* Upload Dropzone */}
+      <div
+        className={`pdf-upload-dropzone ${isDragging ? 'dropzone-active' : ''}`}
+        role="region"
+        aria-label="PDF Document Upload"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        <div className="dropzone-content">
+          <div className="dropzone-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <polyline points="9 15 12 12 15 15"></polyline>
+            </svg>
+          </div>
+
+          <div className="dropzone-prompt">Select or Drag a Procurement Tender PDF</div>
+          <div className="dropzone-sub">Supports multi-page technical specification PDFs up to 20 MB</div>
+
           <input
             type="file"
-            id="tender-pdf-input"
+            id="tender-pdf-file-input"
             accept=".pdf,application/pdf"
             onChange={handleFileChange}
-            className="hidden-file-input"
+            className="file-hidden-input"
           />
-          <label htmlFor="tender-pdf-input" className="file-select-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+
+          <label htmlFor="tender-pdf-file-input" className="file-choose-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
-            <span>{selectedFile ? 'Change PDF File' : 'Select Tender PDF'}</span>
+            <span>{selectedFile ? 'Change Selected PDF' : 'Select PDF File'}</span>
           </label>
-          <span className="selected-filename">
-            {selectedFile ? `${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)` : 'No PDF selected'}
-          </span>
-        </div>
 
-        <button
-          type="button"
-          onClick={handleUpload}
-          disabled={!selectedFile || loading}
-          className="extract-btn"
-        >
-          {loading ? (
-            <>
-              <span className="btn-spinner"></span>
-              <span>Extracting Document...</span>
-            </>
-          ) : (
-            <>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="4 17 10 11 4 5"></polyline>
-                <line x1="12" y1="19" x2="20" y2="19"></line>
-              </svg>
-              <span>Extract Text Page-by-Page</span>
-            </>
+          {selectedFile && (
+            <div className="selected-file-chip">
+              <span>📄 {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</span>
+            </div>
           )}
-        </button>
+
+          <button
+            type="button"
+            className="extract-action-btn"
+            onClick={handleExtract}
+            disabled={!selectedFile || uploading}
+          >
+            {uploading ? (
+              <>
+                <span className="spinner spinner-white" aria-hidden="true"></span>
+                <span>Extracting Document Text...</span>
+              </>
+            ) : (
+              <>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="4 17 10 11 4 5"></polyline>
+                  <line x1="12" y1="19" x2="20" y2="19"></line>
+                </svg>
+                <span>Extract Text From PDF</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
-      {error && (
-        <div className="error-banner" role="alert" style={{ marginTop: '1rem' }}>
-          <strong>Extraction Error:</strong> {error}
+      {uploadError && (
+        <div className="error-banner" role="alert">
+          <strong>Notice: </strong> {uploadError}
         </div>
       )}
 
-      {result && (
-        <div className="extraction-result-box">
-          <div className="extraction-summary-top">
-            <div className="summary-left">
-              <span className={`status-badge status-doc-${result.status.toLowerCase()}`}>
-                Status: {result.status}
+      {/* Extracted Document Viewer */}
+      {extractionResult && (
+        <div className="extracted-doc-container">
+          <div className="extracted-doc-header">
+            <div className="doc-info-left">
+              <span className="std-num-pill" style={{ fontSize: '0.75rem' }}>
+                {extractionResult.status || 'EXTRACTED'}
               </span>
-              <span className="summary-file-info">
-                <strong>{result.filename}</strong> — {result.page_count} Page{result.page_count === 1 ? '' : 's'} ({(result.file_size / 1024).toFixed(1)} KB)
+              <span className="doc-filename">{extractionResult.filename}</span>
+              <span className="doc-meta-badge">
+                {extractionResult.page_count} Page{extractionResult.page_count === 1 ? '' : 's'} · {totalWords || extractionResult.total_words || 0} Words · {(extractionResult.file_size / 1024).toFixed(1)} KB
               </span>
             </div>
-            <span className="summary-doc-id">ID: {result.document_id.slice(0, 8)}...</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Doc ID: {extractionResult.document_id ? extractionResult.document_id.slice(0, 8) : 'local'}...
+            </span>
           </div>
 
-          {result.warnings && result.warnings.length > 0 && (
-            <div className="extraction-warnings-box">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#fbbf24', flexShrink: 0, marginTop: '2px' }}>
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg>
-              <div>
-                <strong>Extraction Warnings:</strong>
-                <ul style={{ paddingLeft: '1.2rem', marginTop: '0.25rem' }}>
-                  {result.warnings.map((w, idx) => (
-                    <li key={idx}>{w}</li>
-                  ))}
-                </ul>
-              </div>
+          {/* Page Navigator Tabs */}
+          {extractionResult.pages && extractionResult.pages.length > 1 && (
+            <div className="page-tabs-bar" role="tablist" aria-label="Extracted Pages">
+              {extractionResult.pages.map((p) => (
+                <button
+                  key={p.page_number}
+                  type="button"
+                  className={`page-tab-btn ${p.page_number === activePage ? 'active' : ''}`}
+                  onClick={() => setActivePage(p.page_number)}
+                  role="tab"
+                  aria-selected={p.page_number === activePage}
+                >
+                  Page {p.page_number}
+                  {!p.has_text && ' (empty)'}
+                </button>
+              ))}
             </div>
           )}
 
-          {result.metadata?.detected_sections?.length > 0 && (
-            <div className="detected-sections-row">
-              <span className="detected-label">Detected Tender Sections:</span>
-              <div className="detected-badges-list">
-                {result.metadata.detected_sections.map((sec, idx) => (
-                  <span key={idx} className="detected-section-badge">{sec}</span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="page-preview-container">
-            <div className="page-nav-bar">
-              <span className="page-nav-label">
-                Inspecting Page {activePage} of {result.page_count}:
+          {/* Extracted Text Box */}
+          <div className="extracted-text-wrapper">
+            <div className="text-meta-row">
+              <span>
+                {activePageData
+                  ? `Viewing Page ${activePageData.page_number} (${activePageData.character_count} Characters · ${activePageData.word_count} Words)`
+                  : 'Document Text'}
               </span>
-              <div className="page-btn-group">
-                {result.pages?.map((p) => (
-                  <button
-                    key={p.page_number}
-                    type="button"
-                    className={`page-num-btn ${p.page_number === activePage ? 'active' : ''}`}
-                    onClick={() => setActivePage(p.page_number)}
-                  >
-                    Page {p.page_number}
-                    {!p.has_text && ' (empty)'}
-                  </button>
-                ))}
-              </div>
+
+              <button
+                type="button"
+                className={`copy-btn ${copied ? 'copied' : ''}`}
+                onClick={handleCopyText}
+                title="Copy text to clipboard"
+              >
+                {copied ? (
+                  <>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Copied ✓</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy Text</span>
+                  </>
+                )}
+              </button>
             </div>
 
-            {activePageData ? (
-              <div className="page-text-card">
-                <div className="page-text-header">
-                  <span className="page-char-count">
-                    {activePageData.character_count} Characters • {activePageData.word_count} Words
-                  </span>
-                  {activePageData.detected_headings?.length > 0 && (
-                    <span className="page-headings-tag">
-                      Headings: {activePageData.detected_headings.join(', ')}
-                    </span>
-                  )}
-                </div>
-
-                {activePageData.has_text ? (
-                  <pre className="extracted-text-content">
-                    {activePageData.cleaned_text}
-                  </pre>
-                ) : (
-                  <div className="empty-page-notice">
-                    <em>No extractable text found on page {activePage}. (Possible image or blank page).</em>
-                  </div>
-                )}
-              </div>
+            {activePageData && activePageData.has_text ? (
+              <pre className="extracted-text-pre">{activePageData.cleaned_text}</pre>
             ) : (
-              <div className="empty-page-notice">No page data available.</div>
+              <div className="state-desc" style={{ fontStyle: 'italic', padding: '1rem 0' }}>
+                No text content extracted on this page (likely image-based or blank).
+              </div>
             )}
+          </div>
+
+          {/* Analyze Action Bar: Seamless Redirect to Home Search */}
+          <div className="analyze-action-bar">
+            <div className="analyze-action-info">
+              <strong style={{ fontSize: '0.9rem', color: 'var(--text-main)', display: 'block', marginBottom: '2px' }}>
+                Analyze Extracted Requirements on Home Search
+              </strong>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Routes extracted technical specification text to the main recommendation engine and automatically searches applicable Indian Standards.
+              </p>
+            </div>
+
+            <div className="analyze-action-controls">
+              {extractionResult.pages && extractionResult.pages.length > 1 && (
+                <div className="scope-toggle-group">
+                  <button
+                    type="button"
+                    className={`scope-toggle-btn ${analyzeScope === 'all' ? 'active' : ''}`}
+                    onClick={() => setAnalyzeScope('all')}
+                  >
+                    Full Tender Document
+                  </button>
+                  <button
+                    type="button"
+                    className={`scope-toggle-btn ${analyzeScope === 'page' ? 'active' : ''}`}
+                    onClick={() => setAnalyzeScope('page')}
+                  >
+                    Page {activePage} Only
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="button"
+                className="analyze-tender-btn"
+                onClick={handleTriggerAnalyze}
+                title="Send extracted text to Home page and search immediately"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span>Analyze on Home Page &rarr;</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

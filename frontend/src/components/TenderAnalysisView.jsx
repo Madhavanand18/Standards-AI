@@ -49,7 +49,7 @@ function ConfidencePill({ confidence }) {
   );
 }
 
-function RequirementCard({ reqRec, index }) {
+function RequirementCard({ reqRec, index: _index }) {
   const [showOriginal, setShowOriginal] = useState(false);
   const [showRecs, setShowRecs] = useState(true);
 
