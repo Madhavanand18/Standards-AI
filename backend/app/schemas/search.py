@@ -46,6 +46,8 @@ class StandardResult(BaseModel):
 
 class SearchResponse(BaseModel):
     query: str
+    normalized_query: str | None = None
+    detected_language: str | None = None
     total_matches: int
     results: list[StandardResult]
     audit_disclaimer: str = (

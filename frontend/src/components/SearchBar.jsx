@@ -2,12 +2,12 @@ import React from 'react';
 
 const QUICK_QUERIES = [
   "12 mm TMT reinforcement bars for RCC construction",
+  "12 mm Fe 500 TMT sariya RCC construction ke liye",
+  "12 मिमी Fe 500 TMT सरिया RCC निर्माण के लिए",
+  "450/750 V PVC copper cable बिजली wiring ke liye",
   "Hot rolled structural steel plates for bridge fabrication",
-  "PVC insulated copper cables for 450/750V internal wiring",
   "High density polyethylene HDPE pipes for potable water supply",
-  "Industrial safety helmets for construction workers",
-  "Common burnt clay building bricks for masonry walls",
-  "Design concrete mix proportioning guidelines"
+  "Industrial safety helmets for construction workers"
 ];
 
 export default function SearchBar({ query, setQuery, onSearch, loading, limit, setLimit }) {
@@ -22,15 +22,20 @@ export default function SearchBar({ query, setQuery, onSearch, loading, limit, s
 
   return (
     <div className="search-card">
-      <label htmlFor="procurement-query" className="search-label">
-        Technical Specification / Requirement Description
-      </label>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <label htmlFor="procurement-query" className="search-label">
+          Technical Specification / Requirement Description
+        </label>
+        <span style={{ fontSize: '0.78rem', color: '#38bdf8', fontWeight: '500' }}>
+          🌐 Search in English, Hindi, or mixed language (Hinglish)
+        </span>
+      </div>
       <div className="search-input-wrapper">
         <textarea
           id="procurement-query"
           className="search-textarea"
           rows={3}
-          placeholder="Enter procurement item description, material specifications, or tender clause (e.g. '12 mm TMT reinforcement bars for RCC construction')..."
+          placeholder="Enter procurement item description in English, Hindi, or Hinglish (e.g. '12 mm Fe 500 TMT sariya RCC construction ke liye')..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}

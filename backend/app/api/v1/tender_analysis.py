@@ -166,17 +166,22 @@ def _search_for_requirement(
     from app.services.lifecycle import LifecycleService
     from app.services.ranker import rank_and_filter_candidates
     from app.services.relationships import get_relationship_service
+    from app.services.normalizer import normalize_query
 
-    query_text = requirement.normalized_text.strip()
+    raw_req_query = requirement.normalized_text.strip()
     rec_warnings: list[str] = []
 
-    if not query_text:
+    if not raw_req_query:
         return RequirementRecommendation(
             requirement=requirement,
             recommendations=[],
             search_query_used="",
             recommendation_warnings=["normalized_text was empty; skipping search."],
         )
+
+    # Apply Run 7 multilingual query normalization
+    norm_res = normalize_query(raw_req_query)
+    query_text = norm_res.normalized_query or raw_req_query
 
     try:
         query_vector = embedding_svc.embed_text(query_text)

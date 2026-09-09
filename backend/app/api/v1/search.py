@@ -7,6 +7,7 @@ from app.schemas.search import SearchRequest, SearchResponse, StandardResult, He
 from app.services.embedding import get_embedding_service, BaseEmbeddingService
 from app.services.vector_store import get_vector_store, QdrantVectorStore
 from app.services.ranker import rank_and_filter_candidates
+from app.services.normalizer import normalize_query
 
 logger = logging.getLogger(__name__)
 
@@ -51,14 +52,20 @@ def search_standards(
 ):
     """
     Semantic standards retrieval endpoint with domain metadata ranking and dynamic threshold filtering.
-    Accepts procurement requirements or technical item description and returns
+    Accepts procurement requirements or technical item description in English, Hindi, Hinglish,
+    or mixed language, normalizes the query while preserving technical identifiers, and returns
     relevance-ranked Indian Standards from Qdrant and SQLite.
     """
-    query_text = request.query.strip()
-    if not query_text:
+    raw_query = request.query.strip()
+    if not raw_query:
         raise HTTPException(status_code=400, detail="Search query must not be empty.")
 
+    query_text = raw_query
     try:
+        # 0. Multilingual & mixed-language normalization
+        norm_result = normalize_query(raw_query)
+        query_text = norm_result.normalized_query or raw_query
+
         # 1. Generate dense query embedding locally
         query_vector = embedding_svc.embed_text(query_text)
 
@@ -154,9 +161,10 @@ def search_standards(
                 )
             )
 
-
         return SearchResponse(
-            query=query_text,
+            query=raw_query,
+            normalized_query=norm_result.normalized_query,
+            detected_language=norm_result.detected_language,
             total_matches=len(results),
             results=results
         )
