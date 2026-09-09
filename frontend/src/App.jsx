@@ -3,8 +3,10 @@ import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
+import WorkflowSection from './components/WorkflowSection';
 import DocumentUpload from './components/DocumentUpload';
 import FuturePage from './components/FuturePage';
+import Footer from './components/Footer';
 import SettingsModal from './components/SettingsModal';
 import AboutModal from './components/AboutModal';
 
@@ -98,6 +100,8 @@ export default function App() {
   const handleClearQuery = () => {
     setQuery('');
     setIsFromDoc(false);
+    setSearchedQuery('');
+    setResults([]);
   };
 
   return (
@@ -186,13 +190,7 @@ export default function App() {
             )}
 
             {!searchedQuery && !loading && (
-              <div className="state-box" role="status">
-                <div className="state-icon">📋</div>
-                <div className="state-title">Ready for Procurement Requirement</div>
-                <div className="state-desc">
-                  Enter a technical specification above, click one of the sample procurement queries, or extract text from a tender PDF to retrieve applicable Indian Standards with verified lifecycle and compliance data.
-                </div>
-              </div>
+              <WorkflowSection />
             )}
           </>
         )}
@@ -205,6 +203,9 @@ export default function App() {
         {/* ── 3. FUTURE CAPABILITIES & ROADMAP TAB ── */}
         {activeTab === 'future' && <FuturePage />}
       </main>
+
+      {/* Global Minimal Footer */}
+      <Footer />
 
       {/* ── MODALS ── */}
       <SettingsModal

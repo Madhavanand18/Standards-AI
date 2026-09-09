@@ -20,7 +20,7 @@ const getStatusBadgeData = (standard) => {
       return {
         label: `Active (${amendmentCount} Amend.)`,
         className: 'status-active-amended',
-        tooltip: 'Standard is active and in force, with published BIS amendments.',
+        tooltip: 'Standard is currently valid and in force, with published BIS amendments.',
         isWarning: false,
       };
     }
@@ -67,7 +67,6 @@ export default function ResultCard({ standard, rank: _rank }) {
   const [expanded, setExpanded] = useState(false);
   const [showFullScope, setShowFullScope] = useState(false);
   const [showAmendments, setShowAmendments] = useState(false);
-  const [showEvents, setShowEvents] = useState(false);
 
   const lc = standard.lifecycle;
   const comp = standard.compliance;
@@ -102,75 +101,103 @@ export default function ResultCard({ standard, rank: _rank }) {
       id={`standard-${(standard.standard_number || 'std').replace(/[^a-zA-Z0-9]/g, '-')}`}
       aria-labelledby={`title-${(standard.standard_number || 'std').replace(/[^a-zA-Z0-9]/g, '-')}`}
     >
-      {/* ── LEVEL 1: SCANNABLE HEADER & ESSENTIAL COMPLIANCE STATUS ── */}
+      {/* ── UX4G LEVEL 1: OFFICIAL STANDARD RECORD HEADER ── */}
       <div className="card-level1">
-        <div className="card-top-badges">
-          <div className="badge-cluster-left">
-            <span className="std-num-pill">{standard.standard_number}</span>
-
-            <span className={`status-pill ${statusInfo.className}`} title={statusInfo.tooltip}>
-              {statusInfo.label}
-            </span>
-
-            {certStatus === 'MANDATORY' && (
-              <span
-                className="compliance-summary-pill comp-mandatory"
-                title="Mandatory Certification: Product requires compulsory ISI Mark under Quality Control Order"
-              >
-                Mandatory Certification
-              </span>
-            )}
-
-            {certStatus === 'VOLUNTARY' && (
-              <span
-                className="compliance-summary-pill comp-voluntary"
-                title="Voluntary Certification: Available for quality assurance under standard BIS scheme"
-              >
-                Voluntary Certification
-              </span>
-            )}
-
-            {qcoStatus === 'APPLICABLE' && certStatus !== 'MANDATORY' && (
-              <span
-                className="compliance-summary-pill comp-mandatory"
-                title="Quality Control Order (QCO) — indicates product is subject to statutory quality enforcement"
-              >
-                QCO Applicable
-              </span>
-            )}
-
+        {/* Row 1: Standard Number & Match Relevance */}
+        <div className="record-header-row">
+          <div className="record-id-group">
+            <span className="std-number-tag">{standard.standard_number}</span>
             {standard.category && (
-              <span className="category-pill">{standard.category}</span>
+              <span className="record-category-tag">{standard.category}</span>
+            )}
+            {(lc?.year_of_publication || standard.year_of_publication) && (
+              <span className="record-meta-text">
+                Published {lc?.year_of_publication || standard.year_of_publication}
+              </span>
             )}
           </div>
 
-          <div className="badge-cluster-right">
-            <span className={`relevance-pill rel-${relevanceLabel.toLowerCase()}`}>
+          <div className="record-score-group">
+            <span className={`relevance-badge rel-${relevanceLabel.toLowerCase()}`}>
               {relevanceLabel} Relevance
             </span>
-            <span className="score-match-pct">{scorePct}% Match</span>
+            <span className="score-text">{scorePct}% Match</span>
           </div>
         </div>
 
-        <h3 id={`title-${(standard.standard_number || 'std').replace(/[^a-zA-Z0-9]/g, '-')}`} className="card-title">
+        {/* Row 2: Standard Title */}
+        <h3 id={`title-${(standard.standard_number || 'std').replace(/[^a-zA-Z0-9]/g, '-')}`} className="record-title">
           {standard.title}
         </h3>
 
-        {/* Match Context Snippet */}
-        <p className="card-match-summary">
-          <span className="match-summary-prefix">Match Context: </span>
-          {standard.explanation
-            ? standard.explanation
-            : standard.scope_snippet
-            ? standard.scope_snippet
-            : standard.scope
-            ? standard.scope.length > 180
-              ? `${standard.scope.slice(0, 180)}...`
-              : standard.scope
-            : 'Authoritative Indian Standard specification matched on technical procurement keywords.'}
-        </p>
+        {/* Row 3: Status & Compliance Information Bar */}
+        <div className="record-status-bar">
+          <div className="status-item">
+            <span className="status-item-label">Status:</span>
+            <span className={`status-pill ${statusInfo.className}`} title={statusInfo.tooltip}>
+              {statusInfo.label}
+            </span>
+          </div>
 
-        {/* Level 1 Action Bar */}
+          {certStatus === 'MANDATORY' && (
+            <div className="status-item">
+              <span className="status-item-label">Certification:</span>
+              <span className="compliance-summary-pill comp-mandatory">
+                Mandatory (ISI Mark)
+              </span>
+            </div>
+          )}
+
+          {certStatus === 'VOLUNTARY' && (
+            <div className="status-item">
+              <span className="status-item-label">Certification:</span>
+              <span className="compliance-summary-pill comp-voluntary">
+                Voluntary Scheme
+              </span>
+            </div>
+          )}
+
+          {qcoStatus === 'APPLICABLE' && (
+            <div className="status-item">
+              <span className="status-item-label">QCO Order:</span>
+              <span className="compliance-summary-pill comp-mandatory">
+                Applicable in Force
+              </span>
+            </div>
+          )}
+
+          {lc?.edition && (
+            <div className="status-item">
+              <span className="status-item-label">Edition:</span>
+              <span className="record-meta-val">{lc.edition}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Row 4: QCO Supporting Explanation Banner */}
+        {qcoStatus === 'APPLICABLE' && (
+          <div className="term-explainer-banner" role="note">
+            <strong>Quality Control Order (QCO) Applicable:</strong> Statutory government order issued under the Bureau of Indian Standards Act, 2016 making compliance and ISI Mark certification mandatory for public procurement and trade.
+          </div>
+        )}
+
+        {/* Row 5: Match Context Snippet */}
+        <div className="record-match-context">
+          <span className="context-label">Match Scope Context: </span>
+          <span className="context-text">
+            {standard.explanation
+              ? standard.explanation
+              : standard.scope_snippet
+              ? standard.scope_snippet
+              : standard.scope
+              ? standard.scope.length > 200
+                ? `${standard.scope.slice(0, 200)}...`
+                : standard.scope
+              : 'Matched against technical procurement keywords in the official Bureau of Indian Standards scope.'}
+          </span>
+        </div>
+
+        {/* Row 6: Primary Actions (View Details & BIS Verification Link) */}
         <div className="card-level1-actions">
           <button
             type="button"
@@ -179,7 +206,7 @@ export default function ResultCard({ standard, rank: _rank }) {
             aria-expanded={expanded}
             aria-controls={`details-${(standard.standard_number || 'std').replace(/[^a-zA-Z0-9]/g, '-')}`}
           >
-            <span>{expanded ? 'Hide Details' : 'View Details'}</span>
+            <span>{expanded ? 'Hide Complete Specification' : 'View Full Details & Clauses'}</span>
             <svg
               className={`view-details-chevron ${expanded ? 'expanded' : ''}`}
               width="14"
@@ -202,9 +229,9 @@ export default function ResultCard({ standard, rank: _rank }) {
               target="_blank"
               rel="noopener noreferrer"
               className="bis-verify-link"
-              title="Verify authoritative record on official BIS Standards Portal (standards.bis.gov.in)"
+              title="Open authoritative standard record on official BIS Portal (standards.bis.gov.in)"
             >
-              <span>Verify on BIS Portal</span>
+              <span>Verify on BIS Portal (standards.bis.gov.in)</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 <polyline points="15 3 21 3 21 9"></polyline>
@@ -215,25 +242,21 @@ export default function ResultCard({ standard, rank: _rank }) {
         </div>
       </div>
 
-      {/* ── LEVEL 2: PROGRESSIVE DISCLOSURE (STRUCTURED SECTIONS) ── */}
+      {/* ── UX4G LEVEL 2: STRUCTURED REGISTRY DATA ACCORDIONS ── */}
       {expanded && (
         <div
           id={`details-${(standard.standard_number || 'std').replace(/[^a-zA-Z0-9]/g, '-')}`}
           className="card-level2-details"
         >
-          {/* Section 1: Why this standard? */}
+          {/* Section 1: Why This Standard Was Recommended */}
           {standard.explanation && (
             <div className="detail-section-box">
               <div className="detail-section-header">
                 <div className="detail-section-title-group">
-                  <svg className="detail-section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                  </svg>
-                  <span>Why This Standard Was Recommended</span>
+                  <span className="section-title-icon" aria-hidden="true">💡</span>
+                  <span className="section-title-text">Recommendation Justification</span>
                 </div>
-                <span className="detail-section-tag">Semantic Match Intelligence</span>
+                <span className="detail-section-tag">Grounded Match Analysis</span>
               </div>
               <p className="detail-text">{standard.explanation}</p>
             </div>
@@ -243,13 +266,10 @@ export default function ResultCard({ standard, rank: _rank }) {
           <div className="detail-section-box">
             <div className="detail-section-header">
               <div className="detail-section-title-group">
-                <svg className="detail-section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <span>Lifecycle & Version Intelligence</span>
+                <span className="section-title-icon" aria-hidden="true">📋</span>
+                <span className="section-title-text">Lifecycle & Version Tracking</span>
               </div>
-              <span className="detail-section-tag">Grounded BIS Record</span>
+              <span className="detail-section-tag">BIS Official Registry</span>
             </div>
 
             {statusInfo.isWarning && (
@@ -289,7 +309,7 @@ export default function ResultCard({ standard, rank: _rank }) {
               {lc?.reaffirmed_year && (
                 <div className="kv-item">
                   <span className="kv-label">Reaffirmed Year</span>
-                  <span className="kv-value" title="Reaffirmation confirms the standard was re-evaluated and remains valid without revisions.">
+                  <span className="kv-value" title="Reaffirmation confirms the standard was evaluated and remains valid without revision.">
                     {lc.reaffirmed_year} ✓
                   </span>
                 </div>
@@ -335,7 +355,7 @@ export default function ResultCard({ standard, rank: _rank }) {
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showAmendments ? 'rotate(90deg)' : 'none', transition: 'transform 150ms ease' }}>
                     <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>
-                  <span>{showAmendments ? 'Hide Amendment History' : `View Verified Amendment History (${amendments.length})`}</span>
+                  <span>{showAmendments ? 'Hide Amendment History' : `View Published Amendments (${amendments.length})`}</span>
                 </button>
 
                 {showAmendments && (
@@ -356,22 +376,14 @@ export default function ResultCard({ standard, rank: _rank }) {
             )}
           </div>
 
-          {/* Section 3: Procurement Compliance & QCO Intelligence */}
+          {/* Section 3: Statutory QCO & Procurement Compliance */}
           <div className="detail-section-box">
             <div className="detail-section-header">
               <div className="detail-section-title-group">
-                <svg className="detail-section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                  <polyline points="9 12 11 14 15 10"></polyline>
-                </svg>
-                <span>Procurement Compliance & Quality Control Orders (QCO)</span>
+                <span className="section-title-icon" aria-hidden="true">⚖️</span>
+                <span className="section-title-text">Statutory Quality Control Orders & Compliance</span>
               </div>
-              <span className="detail-section-tag">Gazette & Regulatory Data</span>
-            </div>
-
-            {/* Plain-Language Explainer for QCO */}
-            <div className="term-explainer-banner">
-              <strong>Quality Control Order (QCO)</strong> — statutory order issued by Central Ministries making BIS compliance and ISI Mark certification mandatory for public procurement, manufacturing, and import.
+              <span className="detail-section-tag">Gazette Notification</span>
             </div>
 
             <div className="detail-kv-grid">
@@ -409,7 +421,7 @@ export default function ResultCard({ standard, rank: _rank }) {
 
               {(comp?.qco_title || comp?.qco_reference) && (
                 <div className="kv-item" style={{ gridColumn: 'span 2' }}>
-                  <span className="kv-label">QCO Order Reference</span>
+                  <span className="kv-label">QCO Order Title / Reference</span>
                   <span className="kv-value">
                     {comp.qco_title || ''} {comp.qco_reference ? `(${comp.qco_reference})` : ''}
                   </span>
@@ -439,7 +451,7 @@ export default function ResultCard({ standard, rank: _rank }) {
 
               {comp?.qco_clause_standard_applicability && (
                 <div className="kv-item" style={{ gridColumn: 'span 2' }}>
-                  <span className="kv-label">Version Transition & Applicability Clause</span>
+                  <span className="kv-label">Applicability Clause</span>
                   <span className="kv-value" style={{ fontWeight: 400, fontSize: '0.82rem' }}>
                     {comp.qco_clause_standard_applicability}
                   </span>
@@ -460,73 +472,18 @@ export default function ResultCard({ standard, rank: _rank }) {
                   rel="noopener noreferrer"
                   className="bis-verify-link"
                 >
-                  <span>View Gazette Notification</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                    <polyline points="15 3 21 3 21 9"></polyline>
-                    <line x1="10" y1="14" x2="21" y2="3"></line>
-                  </svg>
+                  <span>View Gazette Notification ↗</span>
                 </a>
               </div>
             )}
-
-            {/* Regulatory Milestone Timeline Toggle */}
-            {comp?.events && comp.events.length > 0 && (
-              <div style={{ marginTop: '0.75rem' }}>
-                <button
-                  type="button"
-                  className="sub-accordion-btn"
-                  onClick={() => setShowEvents(!showEvents)}
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showEvents ? 'rotate(90deg)' : 'none', transition: 'transform 150ms ease' }}>
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                  </svg>
-                  <span>{showEvents ? 'Hide Regulatory Timeline' : `View Regulatory Milestone Timeline (${comp.events.length})`}</span>
-                </button>
-
-                {showEvents && (
-                  <div className="sub-accordion-list">
-                    {comp.events.map((ev, idx) => (
-                      <div key={ev.id || idx} className="sub-item-card">
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '2px' }}>
-                          <span className="std-num-pill" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>{ev.event_type || 'EVENT'}</span>
-                          <strong>{ev.title}</strong>
-                          {ev.event_date && <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>· {ev.event_date}</span>}
-                        </div>
-                        {ev.description && <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{ev.description}</p>}
-                        {ev.source_url && (
-                          <a href={ev.source_url} target="_blank" rel="noopener noreferrer" className="bis-verify-link" style={{ padding: 0, marginTop: '4px', fontSize: '0.75rem' }}>
-                            <span>View Source Document ↗</span>
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="notice-box notice-info" style={{ marginTop: '0.75rem' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden="true">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-              </svg>
-              <span>
-                Procurement Aid Notice: Sourced from Gazette notifications and BIS registries. Serves as an evidence-backed procurement aid; verify official tender specifications for mandatory compliance clauses.
-              </span>
-            </div>
           </div>
 
           {/* Section 4: Official Scope & Applicability */}
           <div className="detail-section-box">
             <div className="detail-section-header">
               <div className="detail-section-title-group">
-                <svg className="detail-section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-                <span>Official Scope & Technical Applicability</span>
+                <span className="section-title-icon" aria-hidden="true">📖</span>
+                <span className="section-title-text">Official Scope & Technical Coverage</span>
               </div>
               <span className="detail-section-tag">Authoritative BIS Scope</span>
             </div>
@@ -541,7 +498,7 @@ export default function ResultCard({ standard, rank: _rank }) {
                 className="sub-accordion-btn"
                 onClick={() => setShowFullScope(!showFullScope)}
               >
-                <span>{showFullScope ? 'Show Less' : 'Show Full Scope'}</span>
+                <span>{showFullScope ? 'Show Less' : 'Show Complete Technical Scope'}</span>
               </button>
             )}
           </div>
@@ -551,13 +508,10 @@ export default function ResultCard({ standard, rank: _rank }) {
             <div className="detail-section-box">
               <div className="detail-section-header">
                 <div className="detail-section-title-group">
-                  <svg className="detail-section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                  </svg>
-                  <span>Related BIS Standards ({rawRelationships.length})</span>
+                  <span className="section-title-icon" aria-hidden="true">🔗</span>
+                  <span className="section-title-text">Normative References & Allied Standards ({rawRelationships.length})</span>
                 </div>
-                <span className="detail-section-tag">Deterministic Normative Links</span>
+                <span className="detail-section-tag">Normative Links</span>
               </div>
 
               <div className="related-groups-container">
@@ -588,23 +542,19 @@ export default function ResultCard({ standard, rank: _rank }) {
             </div>
           )}
 
-          {/* Section 6: Evidence & Official Source */}
+          {/* Section 6: Official Verification Record */}
           <div className="detail-section-box">
             <div className="detail-section-header">
               <div className="detail-section-title-group">
-                <svg className="detail-section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="16" x2="12" y2="12"></line>
-                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                <span>Evidence & Official Source</span>
+                <span className="section-title-icon" aria-hidden="true">🏛️</span>
+                <span className="section-title-text">Authoritative Verification Record</span>
               </div>
-              <span className="detail-section-tag">Verifiable Sources</span>
+              <span className="detail-section-tag">BIS Verified</span>
             </div>
 
             <div className="evidence-row">
               <span className="evidence-source-tag">
-                {standard.source_evidence_note || lc?.verification_note || "Official Bureau of Indian Standards Specification"}
+                {standard.source_evidence_note || lc?.verification_note || "Official Bureau of Indian Standards Record"}
               </span>
 
               {bisUrl && (
@@ -614,7 +564,7 @@ export default function ResultCard({ standard, rank: _rank }) {
                   rel="noopener noreferrer"
                   className="bis-verify-link"
                 >
-                  <span>Open Official Record (standards.bis.gov.in) ↗</span>
+                  <span>Open Record on standards.bis.gov.in ↗</span>
                 </a>
               )}
             </div>
