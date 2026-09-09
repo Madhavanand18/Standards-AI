@@ -39,4 +39,12 @@ class Settings(BaseSettings):
     MAX_DOCUMENT_SIZE_MB: int = 20
     DOCUMENT_STORAGE_PATH: Path = WORKSPACE_DIR / "data" / "documents"
 
+    # Requirement Extraction Settings (Run 6B)
+    # Provider: "gemini" for production, "mock" for tests / offline use
+    EXTRACTION_PROVIDER: str = "gemini"
+    GEMINI_API_KEY: str | None = None
+    GEMINI_REQUIREMENT_MODEL: str = "gemini-2.0-flash"
+    # Maximum words per extraction chunk (larger docs are split at this boundary)
+    REQUIREMENT_MAX_CHUNK_WORDS: int = 3000
+
 settings = Settings()
