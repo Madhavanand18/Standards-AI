@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
+import DocumentUpload from './components/DocumentUpload';
 
 const API_BASE = 'http://localhost:8000/api/v1';
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('search');
   const [query, setQuery] = useState('');
   const [limit, setLimit] = useState(10);
   const [searchedQuery, setSearchedQuery] = useState('');
@@ -72,73 +74,108 @@ export default function App() {
     <div className="app-container">
       <Header systemHealth={systemHealth} />
 
-      <SearchBar
-        query={query}
-        setQuery={setQuery}
-        onSearch={handleSearch}
-        loading={loading}
-        limit={limit}
-        setLimit={setLimit}
-      />
+      <div className="tab-navigation-bar">
+        <button
+          type="button"
+          className={`tab-nav-btn ${activeTab === 'search' ? 'active' : ''}`}
+          onClick={() => setActiveTab('search')}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Specification Search</span>
+        </button>
 
-      {error && (
-        <div className="error-banner" role="alert">
-          <strong>Search Error:</strong> {error}
-        </div>
-      )}
+        <button
+          type="button"
+          className={`tab-nav-btn ${activeTab === 'upload' ? 'active' : ''}`}
+          onClick={() => setActiveTab('upload')}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <polyline points="9 15 12 12 15 15"></polyline>
+          </svg>
+          <span>Tender Document (PDF)</span>
+          <span className="tab-badge">Run 6A</span>
+        </button>
+      </div>
 
-      {loading && (
-        <div className="loading-box">
-          <div className="spinner"></div>
-          <p>Running local dense multilingual semantic search over BIS database...</p>
-        </div>
-      )}
+      {activeTab === 'search' && (
+        <>
+          <SearchBar
+            query={query}
+            setQuery={setQuery}
+            onSearch={handleSearch}
+            loading={loading}
+            limit={limit}
+            setLimit={setLimit}
+          />
 
-      {!loading && searchedQuery && results.length > 0 && (
-        <section className="results-section">
-          <div className="results-header">
-            <h2 className="results-count">
-              Found {totalMatches || results.length} Potentially Applicable Standard{(totalMatches || results.length) > 1 ? 's' : ''}
-            </h2>
-            <span className="anti-hallucination-badge">
-              ✓ Based on Verified BIS Scope
-            </span>
-          </div>
-
-          <div className="results-list">
-            {results.map((standard, index) => (
-              <ResultCard
-                key={standard.standard_number || index}
-                standard={standard}
-                rank={index + 1}
-              />
-            ))}
-          </div>
-
-          {auditDisclaimer && (
-            <div className="audit-disclaimer-box">
-              <div className="audit-disclaimer-title">Procurement Audit & Compliance Notice</div>
-              <p>{auditDisclaimer}</p>
+          {error && (
+            <div className="error-banner" role="alert">
+              <strong>Search Error:</strong> {error}
             </div>
           )}
-        </section>
+
+          {loading && (
+            <div className="loading-box">
+              <div className="spinner"></div>
+              <p>Running local dense multilingual semantic search over BIS database...</p>
+            </div>
+          )}
+
+          {!loading && searchedQuery && results.length > 0 && (
+            <section className="results-section">
+              <div className="results-header">
+                <h2 className="results-count">
+                  Found {totalMatches || results.length} Potentially Applicable Standard{(totalMatches || results.length) > 1 ? 's' : ''}
+                </h2>
+                <span className="anti-hallucination-badge">
+                  ✓ Based on Verified BIS Scope
+                </span>
+              </div>
+
+              <div className="results-list">
+                {results.map((standard, index) => (
+                  <ResultCard
+                    key={standard.standard_number || index}
+                    standard={standard}
+                    rank={index + 1}
+                  />
+                ))}
+              </div>
+
+              {auditDisclaimer && (
+                <div className="audit-disclaimer-box">
+                  <div className="audit-disclaimer-title">Procurement Audit & Compliance Notice</div>
+                  <p>{auditDisclaimer}</p>
+                </div>
+              )}
+            </section>
+          )}
+
+          {!loading && searchedQuery && results.length === 0 && !error && (
+            <div className="empty-state">
+              <div className="empty-icon">🔍</div>
+              <h3>No Indian Standards matched this specification</h3>
+              <p>Try refining the technical keywords or specifying the material/grade directly.</p>
+            </div>
+          )}
+
+          {!searchedQuery && !loading && (
+            <div className="empty-state">
+              <div className="empty-icon">📋</div>
+              <h3>Ready for Technical Specification Input</h3>
+              <p>Enter a procurement item description above or click one of the sample tender queries to retrieve applicable Indian Standards.</p>
+            </div>
+          )}
+        </>
       )}
 
-      {!loading && searchedQuery && results.length === 0 && !error && (
-        <div className="empty-state">
-          <div className="empty-icon">🔍</div>
-          <h3>No Indian Standards matched this specification</h3>
-          <p>Try refining the technical keywords or specifying the material/grade directly.</p>
-        </div>
-      )}
-
-      {!searchedQuery && !loading && (
-        <div className="empty-state">
-          <div className="empty-icon">📋</div>
-          <h3>Ready for Technical Specification Input</h3>
-          <p>Enter a procurement item description above or click one of the sample tender queries to retrieve applicable Indian Standards.</p>
-        </div>
-      )}
+      {activeTab === 'upload' && <DocumentUpload />}
     </div>
   );
 }

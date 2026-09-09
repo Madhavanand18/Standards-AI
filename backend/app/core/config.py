@@ -35,4 +35,8 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL_NAME: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     EMBEDDING_DIMENSION: int = 384
 
+    # Document Ingestion Settings (Run 6A)
+    MAX_DOCUMENT_SIZE_MB: int = 20
+    DOCUMENT_STORAGE_PATH: Path = WORKSPACE_DIR / "data" / "documents"
+
 settings = Settings()
