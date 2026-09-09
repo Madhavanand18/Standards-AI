@@ -63,7 +63,9 @@ const getStatusBadgeData = (standard) => {
 export default function ResultCard({ standard, rank: _rank }) {
   const [expanded, setExpanded] = useState(false);
   const [showAmendments, setShowAmendments] = useState(false);
+  const [showComplianceEvents, setShowComplianceEvents] = useState(false);
 
+  const comp = standard.compliance;
   const scorePct = Math.round(standard.similarity_score * 100);
   const relevanceLabel = standard.relevance_label || (scorePct >= 60 ? 'High' : scorePct >= 40 ? 'Medium' : 'Low');
 
@@ -268,6 +270,206 @@ export default function ResultCard({ standard, rank: _rank }) {
             )}
           </div>
         )}
+      </div>
+
+      {/* Procurement Compliance & QCO Intelligence Section */}
+      <div className="compliance-section">
+        <div className="compliance-header">
+          <div className="compliance-header-left">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+            <strong>Procurement Compliance & QCO Intelligence</strong>
+          </div>
+          <span className="compliance-header-tag">Grounded Gazette & BIS Evidence</span>
+        </div>
+
+        {/* Status Indicators Row */}
+        <div className="compliance-status-row">
+          <div className="compliance-status-item">
+            <span className="compliance-label">Certification Status</span>
+            <span className={`comp-badge comp-cert-${(comp?.certification_status || 'UNKNOWN').toLowerCase().replace(/_/g, '-')}`}>
+              {comp?.certification_status === 'MANDATORY' ? 'Mandatory Certification' :
+               comp?.certification_status === 'VOLUNTARY' ? 'Voluntary Certification' :
+               comp?.certification_status === 'NOT_IDENTIFIED' ? 'Not Identified' :
+               'Unknown'}
+            </span>
+          </div>
+
+          <div className="compliance-status-item">
+            <span className="compliance-label">QCO Status</span>
+            <span className={`comp-badge comp-qco-${(comp?.qco_status || 'UNKNOWN').toLowerCase().replace(/_/g, '-')}`}>
+              {comp?.qco_status === 'APPLICABLE' ? 'QCO Applicable' :
+               comp?.qco_status === 'UPCOMING' ? 'Upcoming QCO' :
+               comp?.qco_status === 'NOT_IDENTIFIED' ? 'Not Identified' :
+               'Unknown'}
+            </span>
+          </div>
+        </div>
+
+        {/* Detailed Metadata Grid */}
+        {comp && (comp.certification_scheme || comp.issuing_authority || comp.qco_title || comp.qco_reference || comp.enforcement_date || comp.referenced_standard_edition) ? (
+          <div className="compliance-grid">
+            {comp.certification_scheme && (
+              <div className="compliance-grid-item">
+                <span className="compliance-label">Certification Scheme</span>
+                <span className="compliance-value highlight-scheme">{comp.certification_scheme}</span>
+              </div>
+            )}
+
+            {comp.issuing_authority && (
+              <div className="compliance-grid-item">
+                <span className="compliance-label">Issuing Authority</span>
+                <span className="compliance-value">{comp.issuing_authority}</span>
+              </div>
+            )}
+
+            {(comp.qco_title || comp.qco_reference) && (
+              <div className="compliance-grid-item" style={{ gridColumn: 'span 2' }}>
+                <span className="compliance-label">QCO Order / Reference</span>
+                <span className="compliance-value">
+                  {comp.qco_title ? comp.qco_title : ''}
+                  {comp.qco_reference ? (comp.qco_title ? ` (${comp.qco_reference})` : comp.qco_reference) : ''}
+                </span>
+              </div>
+            )}
+
+            {comp.enforcement_date && (
+              <div className="compliance-grid-item">
+                <span className="compliance-label">Enforcement Date</span>
+                <span className="compliance-value highlight-cyan">{comp.enforcement_date}</span>
+              </div>
+            )}
+
+            {comp.referenced_standard_edition && (
+              <div className="compliance-grid-item">
+                <span className="compliance-label">Referenced in QCO</span>
+                <span className="compliance-value">{comp.referenced_standard_edition}</span>
+              </div>
+            )}
+
+            {comp.latest_standard_version && comp.latest_standard_version !== comp.referenced_standard_edition && (
+              <div className="compliance-grid-item">
+                <span className="compliance-label">Latest Version</span>
+                <span className="compliance-value highlight-amber">{comp.latest_standard_version}</span>
+              </div>
+            )}
+
+            {comp.qco_clause_standard_applicability && (
+              <div className="compliance-grid-item" style={{ gridColumn: 'span 2' }}>
+                <span className="compliance-label">Version Transition & Applicability</span>
+                <span className="compliance-value" style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>
+                  {comp.qco_clause_standard_applicability}
+                </span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="compliance-unverified-note">
+            <span>No verified QCO evidence in the current curated dataset. Verification required for mandatory procurement obligations.</span>
+          </div>
+        )}
+
+        {/* Evidence & Verification Source Link */}
+        {comp?.evidence_source_url && (
+          <div className="compliance-evidence-box">
+            <div className="evidence-header">
+              <span className="evidence-source-type">
+                {comp.evidence_source_type ? comp.evidence_source_type.replace(/_/g, ' ') : 'Authoritative Evidence'}
+              </span>
+              {comp.last_verified && (
+                <span className="evidence-last-verified">Verified: {comp.last_verified}</span>
+              )}
+            </div>
+            <div className="evidence-body">
+              <span className="evidence-source-title">{comp.evidence_source_title || 'Official Government Gazette / BIS Order'}</span>
+              <a
+                href={comp.evidence_source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="compliance-source-link"
+                title="Open official Gazette / Ministry notification in new tab"
+              >
+                <span>View Authoritative Source</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* Regulatory Milestone Timeline Accordion */}
+        {comp?.events && comp.events.length > 0 && (
+          <div className="compliance-timeline-section">
+            <button
+              type="button"
+              className="compliance-timeline-toggle-btn"
+              onClick={() => setShowComplianceEvents(!showComplianceEvents)}
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ transform: showComplianceEvents ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}
+              >
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+              <span>{showComplianceEvents ? 'Hide Regulatory Timeline' : `View Regulatory Milestone Timeline (${comp.events.length})`}</span>
+            </button>
+
+            {showComplianceEvents && (
+              <div className="compliance-events-list">
+                {comp.events.map((ev, idx) => (
+                  <div key={ev.id || idx} className="compliance-event-card">
+                    <div className="event-top">
+                      <span className="event-type-badge">{ev.event_type ? ev.event_type.replace(/_/g, ' ') : 'EVENT'}</span>
+                      {ev.event_date && <span className="event-date">{ev.event_date}</span>}
+                      {ev.reference_doc && <span className="event-ref">{ev.reference_doc}</span>}
+                    </div>
+                    <div className="event-title">{ev.title}</div>
+                    {ev.description && <p className="event-desc">{ev.description}</p>}
+                    {ev.source_url && (
+                      <a
+                        href={ev.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="event-source-link"
+                      >
+                        <span>Evidence Doc</span>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                          <polyline points="15 3 21 3 21 9"></polyline>
+                          <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Neutral Compliance Notice */}
+        <div className="compliance-notice-box">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '1px' }}>
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>
+            Procurement Aid Notice: Sourced from official Gazette notifications and BIS compulsory registries. This is an evidence-backed procurement aid and does not constitute formal legal certification or regulatory approval.
+          </span>
+        </div>
       </div>
 
       <div className="result-scope">

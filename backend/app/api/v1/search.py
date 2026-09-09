@@ -112,11 +112,13 @@ def search_standards(
             threshold=request.score_threshold
         )
 
-        # 5. Format results with attached verified standard relationships and lifecycle metadata
+        # 5. Format results with attached verified relationships, lifecycle, and compliance metadata
         from app.services.relationships import get_relationship_service
         from app.services.lifecycle import LifecycleService
+        from app.services.compliance import ComplianceService
         rel_service = get_relationship_service()
         lifecycle_service = LifecycleService()
+        compliance_service = ComplianceService()
 
         results: list[StandardResult] = []
         for c in ranked_candidates:
@@ -124,6 +126,7 @@ def search_standards(
             rel_items = rel_data.get("relationships", [])
             rel_grouped = rel_data.get("grouped_by_type", {})
             lc_data = lifecycle_service.get_lifecycle(c["standard_number"])
+            comp_data = compliance_service.get_compliance(c["standard_number"])
 
             results.append(
                 StandardResult(
@@ -146,7 +149,8 @@ def search_standards(
                     source_evidence_note=c.get("source_evidence_note"),
                     relationships=rel_items,
                     grouped_relationships=rel_grouped,
-                    lifecycle=lc_data
+                    lifecycle=lc_data,
+                    compliance=comp_data
                 )
             )
 
