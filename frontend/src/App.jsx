@@ -38,7 +38,7 @@ export default function App() {
 
   // Fetch system health on mount
   useEffect(() => {
-    fetch(`${API_BASE}/health`)
+    fetch(`${API_BASE.replace(/\/api\/v1\/?$/, '')}/api/v1/health`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
