@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 const QUICK_QUERIES = [
   "12 mm TMT reinforcement bars for RCC construction",
@@ -22,10 +22,129 @@ export default function SearchBar({
   isFromDoc,
   onClearQuery,
 }) {
+  const [isListening, setIsListening] = useState(false);
+  const [voiceError, setVoiceError] = useState(null);
+  const recognitionRef = useRef(null);
+
+  // Feature 3: Browser Web Speech API SpeechRecognition (English en-IN)
+  const SpeechRecognition = typeof window !== 'undefined'
+    ? (window.SpeechRecognition || window.webkitSpeechRecognition)
+    : null;
+  const isSpeechSupported = Boolean(SpeechRecognition);
+
+  // Auto-dismiss voice message after 6 seconds
+  useEffect(() => {
+    if (voiceError) {
+      const timer = setTimeout(() => {
+        setVoiceError(null);
+      }, 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [voiceError]);
+
+  // Clean up recognition if unmounted
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {
+          // ignore
+        }
+      }
+    };
+  }, []);
+
+  const startListening = () => {
+    if (!isSpeechSupported) {
+      setVoiceError('Speech recognition is not supported in this browser. Please use Chrome, Edge, or a compatible browser.');
+      return;
+    }
+
+    setVoiceError(null);
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-IN'; // English (India) per requirement 3
+      recognition.interimResults = false;
+      recognition.continuous = false; // Single session per requirement 11
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setVoiceError(null);
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        if (event.results) {
+          for (let i = 0; i < event.results.length; i++) {
+            if (event.results[i] && event.results[i][0]) {
+              transcript += event.results[i][0].transcript;
+            }
+          }
+        }
+        const cleanedTranscript = transcript.trim();
+        if (cleanedTranscript) {
+          setQuery(cleanedTranscript);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        setIsListening(false);
+        const err = event.error;
+        if (err === 'not-allowed' || err === 'permission-denied') {
+          setVoiceError('Microphone permission denied. Please allow microphone access in your browser settings.');
+        } else if (err === 'no-speech') {
+          setVoiceError('No speech detected. Please click Voice and speak clearly.');
+        } else if (err === 'audio-capture') {
+          setVoiceError('No microphone detected. Please check your audio input device.');
+        } else if (err === 'network') {
+          setVoiceError('Network error during speech recognition. Please check your connection.');
+        } else if (err === 'aborted') {
+          // User stopped manually; clean reset
+          setVoiceError(null);
+        } else {
+          setVoiceError(`Voice recognition error: ${err}`);
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.warn('SpeechRecognition start failed:', err);
+      setIsListening(false);
+      setVoiceError('Unable to start speech recognition. Please try again.');
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // ignore
+      }
+    }
+    setIsListening(false);
+  };
+
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (query.trim() && !loading) {
+      if (query.trim() && !loading && !isListening) {
         onSearch(query);
       }
     }
@@ -128,18 +247,53 @@ export default function SearchBar({
                 type="button"
                 className="clear-text-link"
                 onClick={onClearQuery ? onClearQuery : () => setQuery('')}
-                disabled={loading}
+                disabled={loading || isListening}
               >
                 Clear
               </button>
             )}
+
+            {/* Feature 3: English Speech-to-Text Microphone Button */}
+            <button
+              type="button"
+              id="voice-input-btn"
+              className={`voice-input-btn ${isListening ? 'listening' : ''}`}
+              onClick={toggleListening}
+              disabled={loading}
+              title={
+                !isSpeechSupported
+                  ? 'Voice input not supported in this browser'
+                  : isListening
+                  ? 'Listening for English speech... Click to stop'
+                  : 'Speak specification in English (en-IN Speech-to-Text)'
+              }
+              aria-label={isListening ? 'Stop voice input' : 'Start voice input (English en-IN)'}
+              aria-pressed={isListening}
+            >
+              {isListening ? (
+                <>
+                  <span className="listening-pulse-dot" aria-hidden="true"></span>
+                  <span>Stop</span>
+                </>
+              ) : (
+                <>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                  <span>Voice</span>
+                </>
+              )}
+            </button>
 
             <button
               id="search-btn"
               type="button"
               className="search-submit-btn"
               onClick={() => onSearch(query)}
-              disabled={loading || !query.trim()}
+              disabled={loading || !query.trim() || isListening}
             >
               {loading ? (
                 <>
@@ -158,6 +312,30 @@ export default function SearchBar({
             </button>
           </div>
         </div>
+
+        {/* Feature 3: Real-time Listening and Error Feedback */}
+        {isListening && (
+          <div className="voice-listening-bar" role="status" aria-live="polite">
+            <span className="listening-pulse-dot" aria-hidden="true"></span>
+            <span className="voice-listening-text">
+              <strong>Listening (English en-IN)...</strong> Speak your procurement requirement. Click Stop when done.
+            </span>
+          </div>
+        )}
+
+        {voiceError && (
+          <div className="voice-error-toast" role="alert">
+            <span className="voice-error-text">⚠️ {voiceError}</span>
+            <button
+              type="button"
+              className="voice-error-close"
+              onClick={() => setVoiceError(null)}
+              aria-label="Dismiss voice message"
+            >
+              &times;
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="sample-queries-section">
