@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { API_BASE } from '../config';
 
 export default function SettingsModal({ isOpen, onClose, limit, setLimit, systemHealth }) {
   useEffect(() => {
@@ -89,12 +90,12 @@ export default function SettingsModal({ isOpen, onClose, limit, setLimit, system
 
           {/* System & API Status */}
           <div className="settings-section">
-            <h3 className="settings-section-title">Local Environment Connectivity</h3>
+            <h3 className="settings-section-title">Environment Connectivity</h3>
 
             <div className="setting-item">
               <div className="setting-label-group">
                 <span className="setting-label">API Gateway</span>
-                <span className="setting-code">http://localhost:8000/api/v1</span>
+                <span className="setting-code">{API_BASE}</span>
               </div>
               <span className="setting-status-pill pill-active">
                 {systemHealth?.status === 'HEALTHY' ? 'Connected' : 'Online'}

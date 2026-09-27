@@ -1,9 +1,24 @@
+import os
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Base workspace directory (one level up from backend)
+# Base backend directory
 BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
-WORKSPACE_DIR = BACKEND_DIR.parent
+
+# Robust workspace directory resolution:
+# 1. Respect explicit WORKSPACE_DIR environment variable if set.
+# 2. If BACKEND_DIR.parent / "data" exists, workspace is the repo root.
+# 3. If BACKEND_DIR / "data" exists, workspace is BACKEND_DIR.
+# 4. Fallback to BACKEND_DIR.parent.
+_env_workspace = os.getenv("WORKSPACE_DIR")
+if _env_workspace:
+    WORKSPACE_DIR = Path(_env_workspace).resolve()
+elif (BACKEND_DIR.parent / "data").exists():
+    WORKSPACE_DIR = BACKEND_DIR.parent
+elif (BACKEND_DIR / "data").exists():
+    WORKSPACE_DIR = BACKEND_DIR
+else:
+    WORKSPACE_DIR = BACKEND_DIR.parent
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -12,10 +27,19 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
+    # Server Settings
+    PORT: int = 8000
+    HOST: str = "0.0.0.0"
+
     # API Settings
     PROJECT_NAME: str = "SIH26108 BIS Standards Recommendation Engine"
     API_V1_PREFIX: str = "/api/v1"
     DEBUG: bool = False
+
+    # CORS Settings
+    # Comma-separated list of allowed origins (e.g. "https://example.com,http://localhost:5173"), or "*"
+    FRONTEND_ORIGIN: str = "*"
+    CORS_ALLOW_CREDENTIALS: bool = False
 
     # SQLite Database
     SQLITE_DB_PATH: Path = WORKSPACE_DIR / "data" / "db" / "standards.db"

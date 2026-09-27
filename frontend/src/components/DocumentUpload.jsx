@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const API_BASE = 'http://localhost:8000/api/v1';
+import { API_BASE } from '../config';
 
 export default function DocumentUpload({ onAnalyzeText }) {
   const [selectedFile, setSelectedFile] = useState(null);

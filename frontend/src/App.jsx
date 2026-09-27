@@ -10,7 +10,7 @@ import Footer from './components/Footer';
 import SettingsModal from './components/SettingsModal';
 import AboutModal from './components/AboutModal';
 
-const API_BASE = 'http://localhost:8000/api/v1';
+import { API_BASE } from './config';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -144,7 +144,7 @@ export default function App() {
     } catch (err) {
       console.error('Search request failed:', err);
       setError(
-        err.message || 'Unable to connect to the backend server. Please verify FastAPI is running at http://localhost:8000.'
+        err.message || `Unable to connect to the backend server. Please verify the API is running at ${API_BASE}.`
       );
       setResults([]);
     } finally {

@@ -48,6 +48,8 @@ data/qdrant_storage/
 .env.local
 .env.*.local
 *.env
+!.env.example
+!*.env.example
 
 # IDE & OS
 .vscode/
