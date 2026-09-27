@@ -60,7 +60,7 @@ class Settings(BaseSettings):
     QDRANT_COLLECTION_NAME: str = "bis_standards"
 
     # Embedding Model Settings (Local, 0 API keys)
-    EMBEDDING_MODEL_NAME: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    EMBEDDING_MODEL_NAME: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_DIMENSION: int = 384
 
     # Document Ingestion Settings (Run 6A)
