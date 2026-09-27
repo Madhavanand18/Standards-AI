@@ -1,4 +1,5 @@
 import React from 'react';
+import BeforeAfterSection from './BeforeAfterSection';
 
 const PROCESS_STEPS = [
   {
@@ -96,7 +97,10 @@ const CAPABILITIES = [
 
 export default function WorkflowSection() {
   return (
-    <section className="service-guide-section" aria-labelledby="guide-heading">
+    <section className="service-guide-section" aria-label="Procurement Guidance and Verification Workflow">
+      {/* ── FEATURE 1: FROM MANUAL SEARCH TO STANDARDS INTELLIGENCE ── */}
+      <BeforeAfterSection />
+
       {/* ── SECTION 1: HOW IT WORKS (UX4G Process Pipeline) ── */}
       <div className="section-panel">
         <div className="panel-header-row">
