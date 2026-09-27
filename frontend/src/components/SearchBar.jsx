@@ -4,6 +4,7 @@ const QUICK_QUERIES = [
   "12 mm TMT reinforcement bars for RCC construction",
   "12 mm Fe 500 TMT sariya RCC construction ke liye",
   "12 मिमी Fe 500 TMT सरिया RCC निर्माण के लिए",
+  "கட்டுமானத்திற்கான 12 மிமீ டிஎம்டி கம்பிகள்",
   "450/750 V PVC copper cable बिजली wiring ke liye",
   "Hot rolled structural steel plates for bridge fabrication",
   "High density polyethylene HDPE pipes for potable water supply",
@@ -15,6 +16,7 @@ export default function SearchBar({
   setQuery,
   onSearch,
   loading,
+  loadingText,
   limit,
   setLimit,
   isFromDoc,
@@ -31,6 +33,8 @@ export default function SearchBar({
 
   const wordCount = query.trim() ? query.trim().split(/\s+/).length : 0;
   const isLargeText = query.length > 400;
+  const INDIC_REGEX = /[\u0900-\u0D7F\u0600-\u06FF]/;
+  const isIndic = INDIC_REGEX.test(query);
 
   return (
     <div className="search-container" role="search" aria-label="Indian Standards Specification Search">
@@ -44,7 +48,7 @@ export default function SearchBar({
           )}
         </div>
         <p className="search-subtext">
-          Enter technical specifications, item descriptions, material grades, or procurement clauses in English, Hindi, or Hinglish.
+          Enter technical specifications, item descriptions, material grades, or procurement clauses in English or 22 Indian languages (powered by Sarvam AI).
         </p>
       </div>
 
@@ -77,14 +81,24 @@ export default function SearchBar({
 
         <div className="search-controls-row">
           <div className="search-controls-left">
-            <span className="multilingual-tag" title="Supports English, Hindi, and Hinglish semantic matching">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-              </svg>
-              <span>English, Hindi & Hinglish supported</span>
-            </span>
+            {isIndic ? (
+              <span className="multilingual-tag indic-detected" title="Indian-language script detected. Will translate via Sarvam AI (sarvam-translate:v1)">
+                <span>🇮🇳 Indian Language · Translates via Sarvam AI</span>
+              </span>
+            ) : query.trim() ? (
+              <span className="multilingual-tag" title="Standard English specification. Direct BIS standards search.">
+                <span>✓ English · Direct BIS search</span>
+              </span>
+            ) : (
+              <span className="multilingual-tag" title="Supports English and 22 Indian languages via Sarvam AI">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <span>English & 22 Indian Languages (Sarvam AI)</span>
+              </span>
+            )}
 
             <span className="search-char-count">
               {query.length} chars{wordCount > 0 ? ` · ${wordCount} words` : ''}
@@ -130,7 +144,7 @@ export default function SearchBar({
               {loading ? (
                 <>
                   <span className="spinner spinner-white" aria-hidden="true"></span>
-                  <span>Searching Standards...</span>
+                  <span>{loadingText || 'Searching Standards...'}</span>
                 </>
               ) : (
                 <>

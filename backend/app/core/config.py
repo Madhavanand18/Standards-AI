@@ -6,7 +6,11 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
 WORKSPACE_DIR = BACKEND_DIR.parent
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=(BACKEND_DIR / ".env", ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
 
     # API Settings
     PROJECT_NAME: str = "SIH26108 BIS Standards Recommendation Engine"
@@ -46,5 +50,11 @@ class Settings(BaseSettings):
     GEMINI_REQUIREMENT_MODEL: str = "gemini-2.0-flash"
     # Maximum words per extraction chunk (larger docs are split at this boundary)
     REQUIREMENT_MAX_CHUNK_WORDS: int = 3000
+
+    # Sarvam AI Translation Settings (Feature 2)
+    SARVAM_API_KEY: str | None = None
+    SARVAM_TRANSLATE_MODEL: str = "sarvam-translate:v1"
+    SARVAM_TRANSLATE_URL: str = "https://api.sarvam.ai/translate"
+    SARVAM_REQUEST_TIMEOUT_SECONDS: float = 10.0
 
 settings = Settings()

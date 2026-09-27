@@ -24,10 +24,17 @@ export default function App() {
   const [auditDisclaimer, setAuditDisclaimer] = useState('');
   const [systemHealth, setSystemHealth] = useState(null);
 
+  // Sarvam AI Indian-Language Translation State (Feature 2)
+  const [translationData, setTranslationData] = useState(null);
+  const [loadingText, setLoadingText] = useState('Searching Standards...');
+
   // UX & Flow state
   const [isFromDoc, setIsFromDoc] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [aboutModalOpen, setAboutModalOpen] = useState(false);
+
+  // Unicode pattern covering 22 official Indian language scripts
+  const INDIC_REGEX = /[\u0900-\u0D7F\u0600-\u06FF]/;
 
   // Fetch system health on mount
   useEffect(() => {
@@ -51,6 +58,70 @@ export default function App() {
     setSearchedQuery(q);
 
     const activeLimit = customLimit || limit;
+    let finalQuery = q;
+    let translationInfo = null;
+
+    // Feature 2: Indian-Language Input via Sarvam AI
+    // Rule 1 & 4: English input directly to search, do NOT call Sarvam.
+    // Rule 2 & 3: Indian-language input -> Sarvam Translate (at most once per search) -> English requirement.
+    if (INDIC_REGEX.test(q)) {
+      setLoadingText('Translating Indian language with Sarvam AI...');
+      try {
+        const transRes = await fetch(`${API_BASE}/translate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: q, source_language_code: 'auto' }),
+        });
+
+        if (transRes.ok) {
+          const transData = await transRes.json();
+          if (transData.is_translated && transData.translated_text) {
+            finalQuery = transData.translated_text;
+            translationInfo = {
+              originalText: q,
+              translatedText: transData.translated_text,
+              sourceLanguage: transData.source_language_code,
+              isTranslated: true,
+              error: null,
+            };
+          } else if (transData.error) {
+            translationInfo = {
+              originalText: q,
+              translatedText: q,
+              sourceLanguage: null,
+              isTranslated: false,
+              error: transData.error,
+            };
+          }
+        } else {
+          const errData = await transRes.json().catch(() => ({}));
+          translationInfo = {
+            originalText: q,
+            translatedText: q,
+            sourceLanguage: null,
+            isTranslated: false,
+            error: errData.detail || `Sarvam AI translation unavailable (HTTP ${transRes.status}).`,
+          };
+        }
+      } catch (transErr) {
+        console.warn('Sarvam translation error:', transErr);
+        translationInfo = {
+          originalText: q,
+          translatedText: q,
+          sourceLanguage: null,
+          isTranslated: false,
+          error: 'Sarvam AI translation connection failed. Continuing with direct search.',
+        };
+      }
+    } else {
+      // Already English input: Sarvam is NOT called!
+      translationInfo = null;
+    }
+
+    setTranslationData(translationInfo);
+    setLoadingText('Searching Indian Standards Database...');
 
     try {
       const res = await fetch(`${API_BASE}/search`, {
@@ -58,7 +129,7 @@ export default function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: q, limit: activeLimit }),
+        body: JSON.stringify({ query: finalQuery, limit: activeLimit }),
       });
 
       if (!res.ok) {
@@ -78,6 +149,7 @@ export default function App() {
       setResults([]);
     } finally {
       setLoading(false);
+      setLoadingText('Searching Standards...');
     }
   };
 
@@ -102,6 +174,7 @@ export default function App() {
     setIsFromDoc(false);
     setSearchedQuery('');
     setResults([]);
+    setTranslationData(null);
   };
 
   return (
@@ -129,6 +202,7 @@ export default function App() {
               }}
               onSearch={handleSearch}
               loading={loading}
+              loadingText={loadingText}
               limit={limit}
               setLimit={setLimit}
               isFromDoc={isFromDoc}
@@ -144,9 +218,11 @@ export default function App() {
             {loading && (
               <div className="state-box" aria-live="polite">
                 <div className="spinner"></div>
-                <div className="state-title">Searching Indian Standards Database</div>
+                <div className="state-title">{loadingText}</div>
                 <div className="state-desc">
-                  Performing dense multilingual semantic search and metadata scoring over official BIS standards.
+                  {loadingText.includes('Sarvam')
+                    ? 'Connecting to Sarvam AI text translation engine (sarvam-translate:v1) for Indian-language requirement translation.'
+                    : 'Performing dense multilingual semantic search and metadata scoring over official BIS standards.'}
                 </div>
               </div>
             )}
@@ -161,6 +237,49 @@ export default function App() {
                     ✓ Grounded in Authoritative BIS Scope
                   </span>
                 </div>
+
+                {/* Sarvam AI Indian-Language Translation Banner (Feature 2) */}
+                {translationData && translationData.isTranslated && (
+                  <div className="sarvam-translation-banner" role="region" aria-label="Sarvam AI Translation">
+                    <div className="sarvam-banner-header">
+                      <span className="sarvam-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M5 8l6 6"></path>
+                          <path d="M4 14l6-6 2-3"></path>
+                          <path d="M2 5h12"></path>
+                          <path d="M7 2h1"></path>
+                          <path d="M22 22l-5-10-5 10"></path>
+                          <path d="M14 18h6"></path>
+                        </svg>
+                        Sarvam AI Translation
+                      </span>
+                      <span className="sarvam-model-tag">sarvam-translate:v1</span>
+                      {translationData.sourceLanguage && (
+                        <span className="sarvam-lang-tag">Detected Source: {translationData.sourceLanguage}</span>
+                      )}
+                    </div>
+                    <div className="sarvam-banner-content">
+                      <div className="sarvam-translated-row">
+                        <span className="sarvam-label">Translated Requirement (English):</span>
+                        <span className="sarvam-translated-text">"{translationData.translatedText}"</span>
+                      </div>
+                      <div className="sarvam-original-row">
+                        <span className="sarvam-label">Original Indian-Language Input:</span>
+                        <span className="sarvam-original-text">"{translationData.originalText}"</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {translationData && translationData.error && (
+                  <div className="sarvam-notice-card" role="status">
+                    <span className="sarvam-notice-icon">ℹ️</span>
+                    <div className="sarvam-notice-text">
+                      <strong>Sarvam AI Translation Notice:</strong> {translationData.error}{' '}
+                      <span className="sarvam-notice-subtext">Conducted search directly using original input via multilingual normalization.</span>
+                    </div>
+                  </div>
+                )}
 
                 {results.map((standard, index) => (
                   <ResultCard
@@ -180,13 +299,57 @@ export default function App() {
             )}
 
             {!loading && searchedQuery && results.length === 0 && !error && (
-              <div className="state-box" role="status">
-                <div className="state-icon">🔍</div>
-                <div className="state-title">No Indian Standards Matched This Specification</div>
-                <div className="state-desc">
-                  Try refining the technical keywords, specifying material grades (e.g., Fe 500, IS 1786), or entering alternative procurement descriptions.
+              <>
+                {translationData && translationData.isTranslated && (
+                  <div className="sarvam-translation-banner" role="region" aria-label="Sarvam AI Translation">
+                    <div className="sarvam-banner-header">
+                      <span className="sarvam-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M5 8l6 6"></path>
+                          <path d="M4 14l6-6 2-3"></path>
+                          <path d="M2 5h12"></path>
+                          <path d="M7 2h1"></path>
+                          <path d="M22 22l-5-10-5 10"></path>
+                          <path d="M14 18h6"></path>
+                        </svg>
+                        Sarvam AI Translation
+                      </span>
+                      <span className="sarvam-model-tag">sarvam-translate:v1</span>
+                      {translationData.sourceLanguage && (
+                        <span className="sarvam-lang-tag">Detected Source: {translationData.sourceLanguage}</span>
+                      )}
+                    </div>
+                    <div className="sarvam-banner-content">
+                      <div className="sarvam-translated-row">
+                        <span className="sarvam-label">Translated Requirement (English):</span>
+                        <span className="sarvam-translated-text">"{translationData.translatedText}"</span>
+                      </div>
+                      <div className="sarvam-original-row">
+                        <span className="sarvam-label">Original Indian-Language Input:</span>
+                        <span className="sarvam-original-text">"{translationData.originalText}"</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {translationData && translationData.error && (
+                  <div className="sarvam-notice-card" role="status">
+                    <span className="sarvam-notice-icon">ℹ️</span>
+                    <div className="sarvam-notice-text">
+                      <strong>Sarvam AI Translation Notice:</strong> {translationData.error}{' '}
+                      <span className="sarvam-notice-subtext">Conducted search directly using original input via multilingual normalization.</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="state-box" role="status">
+                  <div className="state-icon">🔍</div>
+                  <div className="state-title">No Indian Standards Matched This Specification</div>
+                  <div className="state-desc">
+                    Try refining the technical keywords, specifying material grades (e.g., Fe 500, IS 1786), or entering alternative procurement descriptions.
+                  </div>
                 </div>
-              </div>
+              </>
             )}
 
             {!searchedQuery && !loading && (
