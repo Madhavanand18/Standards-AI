@@ -124,7 +124,7 @@ export default function App() {
     setLoadingText('Searching Indian Standards Database...');
 
     try {
-      const res = await fetch(`${API_BASE}/search`, {
+      const res = await fetch(`${API_BASE.replace(/\/api\/v1\/?$/, '')}/api/v1/search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
